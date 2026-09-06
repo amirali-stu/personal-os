@@ -1,0 +1,59 @@
+:root {
+  /* Background */
+  --color-bg: #050505;
+  --color-sidebar: #09090b;
+
+  /* Surfaces */
+  --color-surface: #0d0d0f;
+  --color-surface-hover: #151518;
+
+  /* Borders */
+  --color-border: #262626;
+  --color-border-hover: #3f3f46;
+
+  /* Text */
+  --color-text: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #71717a;
+
+  /* Primary */
+  --color-primary: #a855f7;
+  --color-primary-hover: #9333ea;
+  --color-primary-soft: rgba(168, 85, 247, 0.12);
+
+  /* Status */
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #eab308;
+
+  /* Layout */
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 72px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+:root.light-mode {
+  --color-bg: #f5f5f7;
+  --color-sidebar: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f1f4;
+
+  --color-border: #e4e4e7;
+  --color-border-hover: #d4d4d8;
+
+  --color-text: #18181b;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #71717a;
+}
+
+:root.light-mode .text-white {
+  color: var(--color-text);
+}
+
+:root.light-mode .hover\:text-white:hover {
+  color: var(--color-text);
+}

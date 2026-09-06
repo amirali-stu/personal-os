@@ -1,0 +1,286 @@
+import { useState } from "react";
+
+import { Check, CheckCircle2, Plus, Trash2 } from "lucide-react";
+
+import { useTasks, type Task } from "./hooks/useTasks";
+import { TaskCalendar } from "./components/TaskCalendar";
+import { getTodayDate } from "../../lib/dateUtils";
+
+export function TasksPage() {
+  const { tasks, filter, setFilter, addTask, toggleTask, deleteTask } =
+    useTasks();
+
+  const [newTask, setNewTask] = useState("");
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
+
+  const today = getTodayDate();
+  const isTodaySelected = selectedDate === today;
+
+  /*
+   * Tasks for selected date
+   */
+  const selectedTasks = tasks.filter((task) => task.date === selectedDate);
+
+  /*
+   * Progress for selected date
+   */
+  const selectedCompletedCount = selectedTasks.filter(
+    (task) => task.completed,
+  ).length;
+
+  const selectedTotalCount = selectedTasks.length;
+
+  const selectedProgress =
+    selectedTotalCount > 0
+      ? Math.round((selectedCompletedCount / selectedTotalCount) * 100)
+      : 0;
+
+  /*
+   * Filter tasks for selected date
+   */
+  const selectedVisibleTasks = selectedTasks.filter((task) => {
+    if (filter === "active") {
+      return !task.completed;
+    }
+
+    if (filter === "completed") {
+      return task.completed;
+    }
+
+    return true;
+  });
+
+  function handleAddTask() {
+    const title = newTask.trim();
+
+    if (!title) {
+      return;
+    }
+
+    // Task can only be added to today
+    addTask(title);
+
+    setNewTask("");
+  }
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-8">
+      {/* Header */}
+      <section>
+        <p className="mb-2 text-sm text-[var(--color-primary)]">
+          برنامه روزانه
+        </p>
+
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          {isTodaySelected ? "کارهای امروز" : "کارهای روز انتخاب‌شده"}
+        </h1>
+
+        <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+          کارهای روزانه‌ات را مدیریت و پیگیری کن.
+        </p>
+      </section>
+
+      {/* Calendar */}
+      <TaskCalendar
+        tasks={tasks}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+      />
+
+      {/* Add task - Today only */}
+      {isTodaySelected && (
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              value={newTask}
+              onChange={(event) => setNewTask(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleAddTask();
+                }
+              }}
+              placeholder="کار جدید را وارد کن..."
+              className="h-11 flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 text-sm text-white outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)] max-md:py-3"
+            />
+
+            <button
+              type="button"
+              onClick={handleAddTask}
+              className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+            >
+              <Plus size={18} />
+              افزودن کار
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Progress - Today only */}
+      {isTodaySelected && (
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                پیشرفت امروز
+              </p>
+
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-3xl font-bold">
+                  {selectedCompletedCount}
+                </span>
+
+                <span className="text-sm text-[var(--color-text-muted)]">
+                  از {selectedTotalCount} کار
+                </span>
+              </div>
+            </div>
+
+            <span className="text-2xl font-bold text-[var(--color-primary)]">
+              {selectedProgress}٪
+            </span>
+          </div>
+
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--color-surface-hover)]">
+            <div
+              className="h-full rounded-full bg-[var(--color-primary)] transition-all duration-300"
+              style={{
+                width: `${selectedProgress}%`,
+              }}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Task list */}
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+        {/* Filters */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] p-4">
+          <h2 className="font-bold">
+            {isTodaySelected ? "لیست کارهای امروز" : "لیست کارهای این روز"}
+          </h2>
+
+          <div className="flex rounded-lg bg-[var(--color-bg)] p-1">
+            <FilterButton
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+            >
+              همه
+            </FilterButton>
+
+            <FilterButton
+              active={filter === "active"}
+              onClick={() => setFilter("active")}
+            >
+              باقی‌مانده
+            </FilterButton>
+
+            <FilterButton
+              active={filter === "completed"}
+              onClick={() => setFilter("completed")}
+            >
+              انجام‌شده
+            </FilterButton>
+          </div>
+        </div>
+
+        {/* Items */}
+        <div className="divide-y divide-[var(--color-border)]">
+          {selectedVisibleTasks.length === 0 ? (
+            <div className="px-5 py-12 text-center">
+              <CheckCircle2
+                size={32}
+                className="mx-auto text-[var(--color-text-muted)]"
+              />
+
+              <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
+                کاری در این بخش وجود ندارد.
+              </p>
+            </div>
+          ) : (
+            selectedVisibleTasks.map((task) => (
+              <TaskRow
+                key={task.id}
+                task={task}
+                onToggle={() => toggleTask(task.id)}
+                onDelete={() => deleteTask(task.id)}
+              />
+            ))
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function TaskRow({
+  task,
+  onToggle,
+  onDelete,
+}: {
+  task: Task;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="group flex items-center gap-3 px-5 py-4 transition-colors hover:bg-[var(--color-surface-hover)]">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={task.completed ? "بازگرداندن کار" : "انجام کار"}
+        className={[
+          "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all",
+          task.completed
+            ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+            : "border-[var(--color-border-hover)] text-transparent hover:border-[var(--color-primary)]",
+        ].join(" ")}
+      >
+        <Check size={13} strokeWidth={3} />
+      </button>
+
+      <span
+        className={[
+          "flex-1 text-sm transition-all",
+          task.completed
+            ? "text-[var(--color-text-muted)] line-through"
+            : "text-[var(--color-text-secondary)]",
+        ].join(" ")}
+      >
+        {task.title}
+      </span>
+
+      <button
+        type="button"
+        onClick={onDelete}
+        aria-label="حذف کار"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-text-muted)] opacity-0 transition-all hover:bg-[rgba(239,68,68,0.1)] hover:text-[var(--color-danger)] group-hover:opacity-100"
+      >
+        <Trash2 size={16} />
+      </button>
+    </div>
+  );
+}
+
+function FilterButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+        active
+          ? "bg-[var(--color-surface-hover)] text-white"
+          : "text-[var(--color-text-muted)] hover:text-white",
+      ].join(" ")}
+    >
+      {children}
+    </button>
+  );
+}
