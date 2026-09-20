@@ -86,13 +86,12 @@ export function AddTrackPanel({ playlistId, onAddTrack }: Props) {
 
       await onAddTrack({
         playlistId,
-        title: title.trim(),
-        artist:
-          artist.trim() ||
-          text("music.unknownArtist", "هنرمند ناشناس", "Unknown artist"),
+        title,
+        artist,
         duration,
         sourceType: "file",
         audioBlob: selectedFile,
+        sortOrder: Date.now(),
       });
 
       clearSelectedFile();
@@ -118,7 +117,8 @@ export function AddTrackPanel({ playlistId, onAddTrack }: Props) {
         duration: 0,
         sourceType: "url",
         audioUrl: url.trim(),
-      });
+        sortOrder: Date.now(),
+      }); 
 
       clearUrl();
     } finally {

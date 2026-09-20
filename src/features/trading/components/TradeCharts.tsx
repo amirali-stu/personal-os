@@ -15,10 +15,9 @@ import { ChartColumn } from "lucide-react";
 
 import type { Trade } from "../types";
 import { useSettingsStore } from "../../../app/store/settingsStore";
-import { getTodayDate } from "../../../lib/dateUtils";
 
 type Range = "week" | "month" | "year";
-
+// done
 type Props = {
   trades: Trade[];
 };

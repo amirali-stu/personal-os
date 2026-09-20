@@ -1,6 +1,8 @@
-import { useEffect } from "react";
 import { CheckCircle2, Info, AlertTriangle, XCircle, X } from "lucide-react";
-import { useToastStore, type Toast as ToastItem } from "../../app/store/toastStore";
+import {
+  useToastStore,
+  type Toast as ToastItem,
+} from "../../app/store/toastStore";
 
 const icons = {
   success: CheckCircle2,

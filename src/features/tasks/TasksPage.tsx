@@ -41,8 +41,7 @@ export function TasksPage() {
     reorderTasks,
     exportTasks,
     importTasks,
-    loading,
-    progress,
+    loading,  
   } = useTasks();
 
   const [newTask, setNewTask] = useState("");
