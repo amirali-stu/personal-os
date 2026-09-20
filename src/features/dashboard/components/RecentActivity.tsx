@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export type RecentActivityItem = {
   id: string;
@@ -13,13 +14,15 @@ type Props = {
 };
 
 export function RecentActivity({ activities }: Props) {
+  const { t } = useTranslation();
+
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
       <div>
-        <h2 className="font-bold">فعالیت‌های اخیر</h2>
+        <h2 className="font-bold">{t("dashboard.activity.title")}</h2>
 
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-          آخرین فعالیت‌های ثبت‌شده
+          {t("dashboard.activity.subtitle")}
         </p>
       </div>
 
@@ -27,7 +30,7 @@ export function RecentActivity({ activities }: Props) {
         {activities.length === 0 ? (
           <div className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-10 text-center md:col-span-3">
             <p className="text-sm text-[var(--color-text-secondary)]">
-              هنوز فعالیتی ثبت نشده
+              {t("dashboard.activity.empty")}
             </p>
           </div>
         ) : (

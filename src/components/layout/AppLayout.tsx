@@ -13,14 +13,20 @@ export function AppLayout() {
 
   const isCompact = displayMode === "compact";
 
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
   return (
     <div
-      dir="rtl"
       className={`min-h-screen bg-[var(--color-bg)] ${
         isCompact ? "app-compact" : "app-standard"
       }`}
     >
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        isRtl={isRtl}
+      />
 
       {/* Mobile header */}
       <header className="fixed left-0 right-0 top-0 z-30 flex h-16 items-center border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 px-4 backdrop-blur-md lg:hidden">

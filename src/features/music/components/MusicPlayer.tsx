@@ -1,3 +1,4 @@
+// components/MusicPlayer.tsx
 import {
   ChevronDown,
   ChevronUp,
@@ -13,59 +14,50 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useMusicPlayerStore } from "../../../app/store/musicPlayerStore";
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { formatDuration } from "../utils";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 export function MusicPlayer() {
+  const { t } = useTranslation();
+
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
   const audioRef = useAudioPlayer();
 
   const currentTrack = useMusicPlayerStore((state) => state.currentTrack);
-
   const clearPlayer = useMusicPlayerStore((state) => state.clearPlayer);
-
   const isPlaying = useMusicPlayerStore((state) => state.isPlaying);
-
   const volume = useMusicPlayerStore((state) => state.volume);
-
   const isMuted = useMusicPlayerStore((state) => state.isMuted);
-
   const playbackRate = useMusicPlayerStore((state) => state.playbackRate);
-
   const isShuffle = useMusicPlayerStore((state) => state.isShuffle);
-
   const repeatMode = useMusicPlayerStore((state) => state.repeatMode);
-
   const play = useMusicPlayerStore((state) => state.play);
-
   const pause = useMusicPlayerStore((state) => state.pause);
-
   const previous = useMusicPlayerStore((state) => state.previous);
-
   const next = useMusicPlayerStore((state) => state.next);
-
   const setVolume = useMusicPlayerStore((state) => state.setVolume);
-
   const toggleMute = useMusicPlayerStore((state) => state.toggleMute);
-
   const setPlaybackRate = useMusicPlayerStore((state) => state.setPlaybackRate);
-
   const toggleShuffle = useMusicPlayerStore((state) => state.toggleShuffle);
-
   const setRepeatMode = useMusicPlayerStore((state) => state.setRepeatMode);
 
   const [currentTime, setCurrentTime] = useState(0);
-
   const [duration, setDuration] = useState(currentTrack?.duration ?? 0);
-
   const [expanded, setExpanded] = useState(false);
-
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
 
   const progressRef = useRef<HTMLDivElement | null>(null);
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, { defaultValue: isRtl ? fa : en });
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -89,12 +81,10 @@ export function MusicPlayer() {
     };
 
     audio.addEventListener("timeupdate", updateTime);
-
     audio.addEventListener("loadedmetadata", updateDuration);
 
     return () => {
       audio.removeEventListener("timeupdate", updateTime);
-
       audio.removeEventListener("loadedmetadata", updateDuration);
     };
   }, [audioRef]);
@@ -133,13 +123,13 @@ export function MusicPlayer() {
 
     const rect = container.getBoundingClientRect();
 
-    // چون UI راست‌به‌چپ است، محاسبه از سمت راست انجام می‌شود.
-    const position = (rect.right - event.clientX) / rect.width;
+    const position = isRtl
+      ? (rect.right - event.clientX) / rect.width
+      : (event.clientX - rect.left) / rect.width;
 
     const clamped = Math.max(0, Math.min(1, position));
 
     audio.currentTime = clamped * duration;
-
     setCurrentTime(audio.currentTime);
   }
 
@@ -170,43 +160,30 @@ export function MusicPlayer() {
 
   return (
     <div
-      className="
-    fixed
-    bottom-4
-    left-4
-    right-4
-    z-40
-
-    lg:left-4
-    lg:right-[266px]
-
-    overflow-visible
-    rounded-2xl
-
-    border
-    border-[var(--color-border)]/80
-    bg-[var(--color-surface)]/75
-
-    shadow-2xl
-    shadow-black/20
-
-    backdrop-blur-2xl
-    backdrop-saturate-150
-  "
+      dir={isRtl ? "rtl" : "ltr"}
+      className={`
+        fixed
+        bottom-4
+        left-4
+        right-4
+        z-40
+        overflow-visible
+        rounded-2xl
+        border
+        border-[var(--color-border)]/80
+        bg-[var(--color-surface)]/75
+        shadow-2xl
+        shadow-black/20
+        backdrop-blur-2xl
+        backdrop-saturate-150
+        lg:left-4
+        ${isRtl ? "lg:right-[266px]" : "lg:left-[266px]"}
+      `}
     >
-      {/* Progress */}
       <div
         ref={progressRef}
         onClick={handleSeek}
-        className="  group
-  absolute
-  inset-x-0
-  top-0
-  h-1
-  cursor-pointer
-  overflow-hidden
-  rounded-t-2xl
-  bg-white/5"
+        className="group absolute inset-x-0 top-0 h-1 cursor-pointer overflow-hidden rounded-t-2xl bg-white/5"
       >
         <div
           className="h-full bg-[var(--color-primary)] transition-[width] duration-100"
@@ -216,27 +193,27 @@ export function MusicPlayer() {
         />
 
         <div
-          className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-[var(--color-primary)] opacity-0 shadow-lg shadow-purple-500/40 transition-opacity group-hover:opacity-100"
+          className={`absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-[var(--color-primary)] opacity-0 shadow-lg shadow-purple-500/40 transition-opacity group-hover:opacity-100 ${
+            isRtl ? "right-0" : "left-0"
+          }`}
           style={{
-            right: `${progress}%`,
+            [isRtl ? "right" : "left"]: `${progress}%`,
           }}
         />
       </div>
 
       <div className="mx-auto max-w-[1600px] px-3 py-3 sm:px-5">
-        {/* Main */}
         <div className="flex items-center gap-2 sm:gap-4">
           <button
             type="button"
             onClick={handleClosePlayer}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-all hover:bg-red-500/10 hover:text-red-400 active:scale-95"
-            aria-label="توقف آهنگ"
-            title="توقف آهنگ"
+            aria-label={text("music.stopPlayer", "توقف آهنگ", "Stop player")}
+            title={text("music.stopPlayer", "توقف آهنگ", "Stop player")}
           >
             <X size={17} />
           </button>
 
-          {/* Track */}
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-3">
               <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)] sm:flex">
@@ -261,13 +238,12 @@ export function MusicPlayer() {
             </div>
           </div>
 
-          {/* Controls */}
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <button
               type="button"
               onClick={previous}
               className="hidden h-9 w-9 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-white sm:flex"
-              aria-label="آهنگ قبلی"
+              aria-label={text("music.previous", "آهنگ قبلی", "Previous track")}
             >
               <SkipBack size={17} />
             </button>
@@ -276,7 +252,11 @@ export function MusicPlayer() {
               type="button"
               onClick={handlePlayPause}
               className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-primary)] text-white transition-all hover:bg-[var(--color-primary-hover)] active:scale-95"
-              aria-label={isPlaying ? "توقف" : "پخش"}
+              aria-label={
+                isPlaying
+                  ? text("music.pause", "توقف", "Pause")
+                  : text("music.play", "پخش", "Play")
+              }
             >
               {isPlaying ? (
                 <Pause size={17} fill="currentColor" />
@@ -288,19 +268,17 @@ export function MusicPlayer() {
             <button
               type="button"
               onClick={next}
-              className="h-9 w-9 flex items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-white"
-              aria-label="آهنگ بعدی"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-white"
+              aria-label={text("music.next", "آهنگ بعدی", "Next track")}
             >
               <SkipForward size={17} />
             </button>
           </div>
 
-          {/* Time */}
           <div className="hidden shrink-0 text-[10px] tabular-nums text-[var(--color-text-muted)] lg:block">
             {formatDuration(currentTime)} / {formatDuration(duration)}
           </div>
 
-          {/* Desktop controls */}
           <div className="hidden items-center gap-1 md:flex">
             <button
               type="button"
@@ -310,7 +288,7 @@ export function MusicPlayer() {
                   ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
                   : "text-[var(--color-text-muted)] hover:bg-white/5 hover:text-white"
               }`}
-              aria-label="تصادفی"
+              aria-label={text("music.shuffle", "تصادفی", "Shuffle")}
             >
               <Shuffle size={16} />
             </button>
@@ -323,7 +301,7 @@ export function MusicPlayer() {
                   ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
                   : "text-[var(--color-text-muted)] hover:bg-white/5 hover:text-white"
               }`}
-              aria-label="تکرار"
+              aria-label={text("music.repeat", "تکرار", "Repeat")}
             >
               {repeatMode === "one" ? (
                 <Repeat1 size={16} />
@@ -332,12 +310,12 @@ export function MusicPlayer() {
               )}
             </button>
 
-            {/* Speed */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setShowSpeedMenu((current) => !current)}
                 className="flex h-9 items-center gap-1 rounded-lg px-2 text-[10px] font-bold text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-white"
+                aria-label={text("music.speed", "سرعت پخش", "Playback speed")}
               >
                 {playbackRate}x
                 {showSpeedMenu ? (
@@ -348,7 +326,11 @@ export function MusicPlayer() {
               </button>
 
               {showSpeedMenu && (
-                <div className="absolute bottom-11 left-0 w-28 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-2xl">
+                <div
+                  className={`absolute bottom-11 z-50 w-28 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1 shadow-2xl ${
+                    isRtl ? "right-0" : "left-0"
+                  }`}
+                >
                   {SPEEDS.map((speed) => (
                     <button
                       key={speed}
@@ -364,7 +346,6 @@ export function MusicPlayer() {
                       }`}
                     >
                       <span>{speed}x</span>
-
                       {playbackRate === speed && <span>✓</span>}
                     </button>
                   ))}
@@ -372,12 +353,11 @@ export function MusicPlayer() {
               )}
             </div>
 
-            {/* Volume */}
             <button
               type="button"
               onClick={toggleMute}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-white"
-              aria-label="صدا"
+              aria-label={text("music.volume", "صدا", "Volume")}
             >
               {isMuted || volume === 0 ? (
                 <VolumeX size={16} />
@@ -394,21 +374,24 @@ export function MusicPlayer() {
               value={isMuted ? 0 : volume}
               onChange={handleVolumeChange}
               className="w-20 accent-[var(--color-primary)]"
-              aria-label="ولوم"
+              aria-label={text("music.volume", "ولوم", "Volume")}
             />
           </div>
 
-          {/* Mobile expand */}
           <button
             type="button"
             onClick={() => setExpanded((current) => !current)}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-white md:hidden"
+            aria-label={
+              expanded
+                ? text("music.collapse", "بستن کنترل‌ها", "Collapse controls")
+                : text("music.expand", "باز کردن کنترل‌ها", "Expand controls")
+            }
           >
             {expanded ? <ChevronDown size={17} /> : <ChevronUp size={17} />}
           </button>
         </div>
 
-        {/* Mobile Expanded */}
         {expanded && (
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2 border-t border-[var(--color-border)] pt-3 md:hidden">
             <button
@@ -417,7 +400,7 @@ export function MusicPlayer() {
               className="flex h-9 items-center gap-2 rounded-lg border border-[var(--color-border)] px-3 text-[10px] text-[var(--color-text-secondary)]"
             >
               <SkipBack size={14} />
-              قبلی
+              {text("music.previousShort", "قبلی", "Previous")}
             </button>
 
             <button
@@ -425,7 +408,7 @@ export function MusicPlayer() {
               onClick={next}
               className="flex h-9 items-center gap-2 rounded-lg border border-[var(--color-border)] px-3 text-[10px] text-[var(--color-text-secondary)]"
             >
-              بعدی
+              {text("music.nextShort", "بعدی", "Next")}
               <SkipForward size={14} />
             </button>
 
@@ -439,7 +422,7 @@ export function MusicPlayer() {
               }`}
             >
               <Shuffle size={14} />
-              تصادفی
+              {text("music.shuffle", "تصادفی", "Shuffle")}
             </button>
 
             <button
@@ -454,10 +437,10 @@ export function MusicPlayer() {
               )}
 
               {repeatMode === "off"
-                ? "تکرار خاموش"
+                ? text("music.repeatOff", "تکرار خاموش", "Repeat off")
                 : repeatMode === "all"
-                  ? "تکرار لیست"
-                  : "تکرار آهنگ"}
+                  ? text("music.repeatAll", "تکرار لیست", "Repeat all")
+                  : text("music.repeatOne", "تکرار آهنگ", "Repeat one")}
             </button>
 
             <button
@@ -467,7 +450,7 @@ export function MusicPlayer() {
               }
               className="flex h-9 items-center gap-2 rounded-lg border border-[var(--color-border)] px-3 text-[10px] text-[var(--color-text-secondary)]"
             >
-              سرعت {playbackRate}x
+              {text("music.speedLabel", "سرعت", "Speed")} {playbackRate}x
             </button>
 
             <button
@@ -476,7 +459,7 @@ export function MusicPlayer() {
               className="flex h-9 items-center gap-2 rounded-lg border border-[var(--color-border)] px-3 text-[10px] text-[var(--color-text-secondary)]"
             >
               {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
-              صدا
+              {text("music.volume", "صدا", "Volume")}
             </button>
 
             <div className="flex w-full items-center gap-2">
@@ -493,6 +476,7 @@ export function MusicPlayer() {
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
                 className="w-full accent-[var(--color-primary)]"
+                aria-label={text("music.volume", "ولوم", "Volume")}
               />
 
               <Volume2

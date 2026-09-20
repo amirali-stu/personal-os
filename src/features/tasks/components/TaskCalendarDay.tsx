@@ -1,4 +1,7 @@
+// TaskCalendarDay.tsx
+
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { Task } from "../hooks/useTasks";
 import { TaskTooltip } from "./TaskTooltip";
@@ -15,7 +18,6 @@ type TaskCalendarDayProps = {
 };
 
 export function TaskCalendarDay({
-  dateKey,
   dayNumber,
   dayTasks,
   isToday,
@@ -24,6 +26,8 @@ export function TaskCalendarDay({
   holidayName,
   onSelect,
 }: TaskCalendarDayProps) {
+  const { t } = useTranslation();
+
   const buttonRef = useRef<HTMLButtonElement>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -34,7 +38,6 @@ export function TaskCalendarDay({
   const total = dayTasks.length;
 
   const showTooltip = total > 0 || Boolean(holidayName);
-
   const shouldShowTooltip = showTooltip && (isDayHovered || isTooltipHovered);
 
   function clearCloseTimeout() {
@@ -88,35 +91,26 @@ export function TaskCalendarDay({
         onMouseLeave={handleDayMouseLeave}
         className={[
           "group relative min-w-0 overflow-visible rounded-xl border text-right transition-all",
-
-          // Mobile
           "min-h-[72px] p-2",
-
-          // Tablet / Desktop
           "sm:min-h-[82px] sm:p-2.5",
           "md:min-h-[88px]",
-
           "hover:-translate-y-0.5",
           "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40",
-
           isSelected
             ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
             : isHoliday
-              ? "border-red-500/60  bg-red-500/10 hover:border-red-500 hover:bg-red-500/15"
+              ? "border-red-500/60 bg-red-500/10 hover:border-red-500 hover:bg-red-500/15"
               : "border-[var(--color-border)] bg-[var(--color-bg)]",
-
           isToday && !isSelected ? "ring-1 ring-[var(--color-primary)]" : "",
         ].join(" ")}
       >
-        {/* Holiday top line */}
         {isHoliday && (
           <span
-            className="absolute inset-x-0 top-0 h-1 rounded-t-xl mx-1 bg-red-500"
+            className="absolute inset-x-0 top-0 mx-1 h-1 rounded-t-xl bg-red-500"
             aria-hidden="true"
           />
         )}
 
-        {/* Day number */}
         <div className="flex items-start justify-between gap-1">
           <span
             className={[
@@ -134,21 +128,19 @@ export function TaskCalendarDay({
           {isHoliday && (
             <span
               className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"
-              title={holidayName ?? "تعطیل رسمی"}
+              title={holidayName ?? t("tasks.calendar.officialHoliday")}
             />
           )}
         </div>
 
-        {/* Today */}
         {isToday && (
           <div className="mt-1">
             <span className="text-[9px] font-medium text-[var(--color-primary)] sm:text-[10px]">
-              امروز
+              {t("tasks.calendar.today")}
             </span>
           </div>
         )}
 
-        {/* Holiday */}
         {isHoliday && holidayName && (
           <p className="mt-2 hidden truncate text-[10px] font-semibold text-red-400 sm:block">
             {holidayName}
@@ -157,11 +149,10 @@ export function TaskCalendarDay({
 
         {isHoliday && (
           <p className="mt-2 text-[10px] font-semibold text-red-400 sm:hidden">
-            تعطیل
+            {t("tasks.calendar.holidayShort")}
           </p>
         )}
 
-        {/* Tasks */}
         {total > 0 && (
           <div className="absolute inset-x-2 bottom-2 sm:inset-x-2.5 sm:bottom-2.5">
             <div className="flex items-center gap-1.5">

@@ -1,4 +1,8 @@
-import { CheckCircle2 } from "lucide-react";
+// src/features/trading/components/DailyLimit.tsx
+
+import { useTranslation } from "react-i18next";
+
+import { useSettingsStore } from "../../../app/store/settingsStore";
 
 type Props = {
   count: number;
@@ -6,10 +10,33 @@ type Props = {
 };
 
 export function DailyLimit({ count, limit }: Props) {
+  const { t } = useTranslation();
+
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
   const reached = count >= limit;
+
+  const formatNumber = (value: number) =>
+    value.toLocaleString(isRtl ? "fa-IR" : "en-US");
+
+  const title = t("tasks.dailyLimit.title", {
+    defaultValue: isRtl ? "محدودیت معاملات روزانه" : "Daily Trading Limit",
+  });
+
+  const description = t("tasks.dailyLimit.description", {
+    defaultValue: isRtl
+      ? `حداکثر ${formatNumber(limit)} معامله در هر روز مجاز است.`
+      : `Up to ${formatNumber(limit)} trades are allowed each day.`,
+  });
+
+  const countText = isRtl
+    ? `${formatNumber(count)} از ${formatNumber(limit)}`
+    : `${formatNumber(count)} of ${formatNumber(limit)}`;
 
   return (
     <div
+      dir={isRtl ? "rtl" : "ltr"}
       className={[
         "rounded-2xl border p-4",
         reached
@@ -18,13 +45,11 @@ export function DailyLimit({ count, limit }: Props) {
       ].join(" ")}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="text-sm font-semibold text-white">
-            محدودیت معاملات روزانه
-          </div>
+        <div className="text-start">
+          <div className="text-sm font-semibold text-white">{title}</div>
 
           <div className="mt-1 text-xs text-[var(--color-text-muted)]">
-            حداکثر {limit} معامله در هر روز مجاز است.
+            {description}
           </div>
         </div>
 
@@ -41,8 +66,8 @@ export function DailyLimit({ count, limit }: Props) {
             />
           ))}
 
-          <span className="mr-1 text-xs text-[var(--color-text-secondary)]">
-            {count} از {limit}
+          <span className="ms-1 text-xs text-[var(--color-text-secondary)]">
+            {countText}
           </span>
         </div>
       </div>

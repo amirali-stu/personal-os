@@ -1,3 +1,7 @@
+// src/features/trading/TradingPage.tsx
+
+import { useTranslation } from "react-i18next";
+
 import { TradingHeader } from "./components/TradingHeader";
 import { TradingStats } from "./components/TradingStats";
 import { DailyLimit } from "./components/DailyLimit";
@@ -10,6 +14,8 @@ import { useSettingsStore } from "../../app/store/settingsStore";
 import { formatFullDate } from "../../lib/dateUtils";
 
 export function TradingPage() {
+  const { t } = useTranslation();
+
   const {
     trades,
     todayTrades,
@@ -22,10 +28,16 @@ export function TradingPage() {
   } = useTrades();
 
   const tradeLimit = useSettingsStore((state) => state.tradeLimit);
-
   const dateFormat = useSettingsStore((state) => state.dateFormat);
-
   const timezone = useSettingsStore((state) => state.timezone);
+  const language = useSettingsStore((state) => state.language);
+
+  const isRtl = language === "fa";
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, {
+      defaultValue: isRtl ? fa : en,
+    });
 
   const limitReached = todayTrades.length >= tradeLimit;
 
@@ -41,10 +53,10 @@ export function TradingPage() {
   const formattedDate = formatFullDate(currentDate, dateFormat, timezone);
 
   return (
-    <div className="space-y-6">
+    <div dir={isRtl ? "rtl" : "ltr"} className="space-y-6">
       <TradingHeader />
 
-      <div className="text-xs text-[var(--color-text-muted)]">
+      <div className="text-start text-xs text-[var(--color-text-muted)]">
         {formattedDate}
       </div>
 

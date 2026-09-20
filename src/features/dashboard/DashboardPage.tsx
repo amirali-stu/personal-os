@@ -1,5 +1,7 @@
 import { CheckCircle2, Clock3, TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
+import { useSettingsStore } from "../../app/store/settingsStore";
 import { useTasks } from "../tasks/hooks/useTasks";
 import { useTrades } from "../trading/hooks/useTrades";
 import { useMarketData } from "../markets/hooks/useMarketData";
@@ -12,6 +14,12 @@ import {
 } from "./components/RecentActivity";
 
 export function DashboardPage() {
+  const { t } = useTranslation();
+
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+  const locale = isRtl ? "fa-IR" : "en-US";
+
   const { recentTasks, completedCount, totalCount, progress } = useTasks();
 
   const { trades, todayTrades, totalResult, successfulTrades, failedTrades } =
@@ -26,23 +34,31 @@ export function DashboardPage() {
   const recentActivities: RecentActivityItem[] = [
     ...recentTrades.map((trade) => ({
       id: `trade-${trade.id}`,
-      title: `ثبت معامله ${trade.symbol}`,
+      title: t("dashboard.activity.tradeRecorded", {
+        symbol: trade.symbol,
+      }),
       description:
         trade.result > 0
-          ? `سود ${formatResult(trade.result)}`
+          ? t("dashboard.activity.profit", {
+              value: formatResult(trade.result, locale),
+            })
           : trade.result < 0
-            ? `زیان ${formatResult(trade.result)}`
-            : "معامله بدون سود یا زیان",
-      time: formatActivityTime(trade.createdAt),
+            ? t("dashboard.activity.loss", {
+                value: formatResult(trade.result, locale),
+              })
+            : t("dashboard.activity.noProfitLoss"),
+      time: formatActivityTime(trade.createdAt, locale),
       icon: TrendingUp,
       timestamp: trade.createdAt,
     })),
 
     ...recentTasks.slice(0, 3).map((task) => ({
       id: `task-${task.id}`,
-      title: task.completed ? "تکمیل کار روزانه" : "کار جدید",
+      title: task.completed
+        ? t("dashboard.activity.taskCompleted")
+        : t("dashboard.activity.newTask"),
       description: task.title,
-      time: formatActivityTime(task.createdAt),
+      time: formatActivityTime(task.createdAt, locale),
       icon: task.completed ? CheckCircle2 : Clock3,
       timestamp: task.createdAt,
     })),
@@ -51,29 +67,32 @@ export function DashboardPage() {
     .slice(0, 6);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div dir={isRtl ? "rtl" : "ltr"} className="space-y-8">
       <WelcomeHeader isOnline={isOnline} />
 
-      {/* Stats */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard
-          title="کارهای امروز"
-          value={`${toPersianNumber(completedCount)} / ${toPersianNumber(
+          title={t("dashboard.stats.todayTasks")}
+          value={`${formatNumber(completedCount, locale)} / ${formatNumber(
             totalCount,
+            locale,
           )}`}
           description={
             totalCount === 0
-              ? "هنوز کاری ثبت نشده"
-              : `${toPersianNumber(totalCount - completedCount)} کار باقی مانده`
+              ? t("dashboard.stats.noTasks")
+              : t("dashboard.stats.remainingTasks", {
+                  count: totalCount - completedCount,
+                })
           }
           icon={CheckCircle2}
         />
 
         <StatCard
-          title="عملکرد ترید"
-          value={formatResult(totalResult)}
-          description={`${toPersianNumber(trades.length)} معامله ثبت شده`}
+          title={t("dashboard.stats.tradingPerformance")}
+          value={formatResult(totalResult, locale)}
+          description={t("dashboard.stats.tradesRecorded", {
+            count: formatNumber(trades.length, locale),
+          })}
           icon={TrendingUp}
           type={
             totalResult > 0 ? "success" : totalResult < 0 ? "danger" : "default"
@@ -81,34 +100,37 @@ export function DashboardPage() {
         />
 
         <StatCard
-          title="وضعیت معاملات"
-          value={`${toPersianNumber(todayTrades.length)} معامله`}
-          description={`${toPersianNumber(
-            successfulTrades,
-          )} موفق • ${toPersianNumber(failedTrades)} ناموفق`}
+          title={t("dashboard.stats.tradeStatus")}
+          value={t("dashboard.stats.tradeCount", {
+            count: formatNumber(todayTrades.length, locale),
+          })}
+          description={t("dashboard.stats.successFailure", {
+            success: formatNumber(successfulTrades, locale),
+            failed: formatNumber(failedTrades, locale),
+          })}
           icon={TrendingUp}
         />
       </section>
 
-      {/* Main Grid */}
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        {/* Markets */}
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 xl:col-span-2">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="font-bold">بازارهای منتخب</h2>
+              <h2 className="text-start font-bold">
+                {t("dashboard.markets.title")}
+              </h2>
 
-              <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-                نمای سریع بازار
+              <p className="mt-1 text-start text-xs text-[var(--color-text-muted)]">
+                {t("dashboard.markets.subtitle")}
               </p>
             </div>
 
             <span className="shrink-0 rounded-lg bg-[var(--color-surface-hover)] px-2.5 py-1 text-xs text-[var(--color-text-muted)]">
               {marketsLoading
-                ? "در حال بروزرسانی..."
+                ? t("dashboard.markets.updating")
                 : isOnline
-                  ? "داده آنلاین"
-                  : "داده ذخیره‌شده"}
+                  ? t("dashboard.markets.online")
+                  : t("dashboard.markets.cached")}
             </span>
           </div>
 
@@ -116,37 +138,39 @@ export function DashboardPage() {
             {markets.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-10 text-center">
                 <p className="text-sm text-[var(--color-text-secondary)]">
-                  اطلاعات بازار در دسترس نیست
+                  {t("dashboard.markets.unavailable")}
                 </p>
               </div>
             ) : (
               markets.map((market) => (
-                <MarketRow key={market.id} market={market} />
+                <MarketRow key={market.id} market={market} locale={locale} />
               ))
             )}
           </div>
         </div>
 
-        {/* Tasks */}
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
           <div>
-            <h2 className="font-bold">آخرین تسک‌ها</h2>
+            <h2 className="text-start font-bold">
+              {t("dashboard.tasks.title")}
+            </h2>
 
-            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-              ۵ تسک آخر ثبت‌شده
+            <p className="mt-1 text-start text-xs text-[var(--color-text-muted)]">
+              {t("dashboard.tasks.subtitle")}
             </p>
           </div>
 
-          {/* Today Progress */}
           <div className="mt-6">
             <div className="flex items-end justify-between">
               <span className="text-3xl font-bold">
-                {toPersianNumber(progress)}٪
+                {formatNumber(progress, locale)}٪
               </span>
 
               <span className="text-xs text-[var(--color-text-muted)]">
-                {toPersianNumber(completedCount)} از{" "}
-                {toPersianNumber(totalCount)} کار امروز
+                {t("dashboard.tasks.progress", {
+                  completed: formatNumber(completedCount, locale),
+                  total: formatNumber(totalCount, locale),
+                })}
               </span>
             </div>
 
@@ -160,11 +184,10 @@ export function DashboardPage() {
             </div>
           </div>
 
-          {/* Last 5 Tasks */}
           <div className="mt-6 space-y-3">
             {recentTasks.length === 0 ? (
               <p className="py-4 text-center text-xs text-[var(--color-text-muted)]">
-                هنوز کاری ثبت نشده
+                {t("dashboard.tasks.empty")}
               </p>
             ) : (
               recentTasks.map((task) => (
@@ -179,7 +202,6 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {/* Recent Activity */}
       <RecentActivity activities={recentActivities} />
     </div>
   );
@@ -194,21 +216,19 @@ type MarketRowProps = {
     type: string;
     unit: string;
   };
+  locale: string;
 };
 
-function MarketRow({ market }: MarketRowProps) {
+function MarketRow({ market, locale }: MarketRowProps) {
   const positive = market.change24h >= 0;
 
-  const price =
-    market.type === "forex"
-      ? market.price.toLocaleString("en-US", {
-          minimumFractionDigits: 4,
-          maximumFractionDigits: 4,
-        })
-      : market.price.toLocaleString("fa-IR");
+  const price = market.price.toLocaleString(locale, {
+    minimumFractionDigits: market.type === "forex" ? 4 : 0,
+    maximumFractionDigits: market.type === "forex" ? 4 : 2,
+  });
 
   const change = `${positive ? "+" : ""}${market.change24h.toLocaleString(
-    "en-US",
+    locale,
     {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -226,15 +246,17 @@ function MarketRow({ market }: MarketRowProps) {
         </div>
 
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{market.name}</p>
+          <p className="truncate text-start text-sm font-medium">
+            {market.name}
+          </p>
 
-          <p className="mt-0.5 truncate text-[10px] text-[var(--color-text-muted)]">
+          <p className="mt-0.5 truncate text-start text-[10px] text-[var(--color-text-muted)]">
             {market.unit}
           </p>
         </div>
       </div>
 
-      <div className="text-left">
+      <div className="text-end">
         <p dir="ltr" className="text-sm font-semibold">
           {market.type === "forex" ? `$${price}` : price}
         </p>
@@ -271,7 +293,7 @@ function TaskItem({ title, completed }: { title: string; completed: boolean }) {
 
       <span
         className={[
-          "min-w-0 truncate text-sm",
+          "min-w-0 truncate text-start text-sm",
           completed
             ? "text-[var(--color-text-muted)] line-through"
             : "text-[var(--color-text-secondary)]",
@@ -283,20 +305,31 @@ function TaskItem({ title, completed }: { title: string; completed: boolean }) {
   );
 }
 
-function formatResult(value: number) {
+function formatResult(value: number, locale: string) {
+  const formatted = Math.abs(value).toLocaleString(locale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+
   if (value > 0) {
-    return `+${value.toLocaleString("fa-IR")}`;
+    return `+${formatted}`;
   }
 
-  return value.toLocaleString("fa-IR");
+  if (value < 0) {
+    return `-${formatted}`;
+  }
+
+  return formatted;
 }
 
-function toPersianNumber(value: number) {
-  return value.toLocaleString("fa-IR");
+function formatNumber(value: number, locale: string) {
+  return value.toLocaleString(locale, {
+    maximumFractionDigits: 2,
+  });
 }
 
-function formatActivityTime(timestamp: number) {
-  return new Intl.DateTimeFormat("fa-IR", {
+function formatActivityTime(timestamp: number, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(timestamp));

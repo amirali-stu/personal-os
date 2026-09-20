@@ -1,8 +1,21 @@
 export type DateFormat = "jalali" | "gregorian";
+
 export type Timezone = "local" | "utc";
 
-function getTimeZone(timezone: Timezone) {
+function getTimeZone(timezone: Timezone): string | undefined {
   return timezone === "utc" ? "UTC" : undefined;
+}
+
+function getLocale(language: string): string {
+  return language === "en" ? "en-US" : "fa-IR";
+}
+
+function getCalendar(dateFormat: DateFormat, language: string): string {
+  if (language === "en") {
+    return "gregory";
+  }
+
+  return dateFormat === "gregorian" ? "gregory" : "persian";
 }
 
 export function formatPersianDate(
@@ -23,7 +36,9 @@ export function formatPersianDate(
     }).format(date);
   }
 
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+  return new Intl.DateTimeFormat("fa-IR", {
+    calendar: "persian",
+    numberingSystem: "arabext",
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -34,8 +49,11 @@ export function formatPersianDate(
 export function formatWeekday(
   date: Date = new Date(),
   timezone: Timezone = "local",
+  language: string = "fa",
 ): string {
-  return new Intl.DateTimeFormat("fa-IR", {
+  const locale = getLocale(language);
+
+  return new Intl.DateTimeFormat(locale, {
     weekday: "long",
     timeZone: getTimeZone(timezone),
   }).format(date);
@@ -45,12 +63,21 @@ export function formatFullDate(
   date: Date = new Date(),
   dateFormat: DateFormat = "jalali",
   timezone: Timezone = "local",
+  language: string = "fa",
 ): string {
-  const weekday = formatWeekday(date, timezone);
+  const locale = getLocale(language);
+  const timeZone = getTimeZone(timezone);
+  const calendar = getCalendar(dateFormat, language);
 
-  const formattedDate = formatPersianDate(date, dateFormat, timezone);
-
-  return `${weekday}، ${formattedDate}`;
+  return new Intl.DateTimeFormat(locale, {
+    calendar,
+    numberingSystem: language === "fa" ? "arabext" : "latn",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone,
+  }).format(date);
 }
 
 export function getTodayDate(timezone: Timezone = "local"): string {
@@ -58,6 +85,7 @@ export function getTodayDate(timezone: Timezone = "local"): string {
 
   const formatter = new Intl.DateTimeFormat("en-CA", {
     calendar: "gregory",
+    numberingSystem: "latn",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -70,8 +98,12 @@ export function getTodayDate(timezone: Timezone = "local"): string {
 export function formatTime(
   date: Date | number = new Date(),
   timezone: Timezone = "local",
+  language: string = "fa",
 ): string {
-  return new Intl.DateTimeFormat("fa-IR", {
+  const locale = getLocale(language);
+
+  return new Intl.DateTimeFormat(locale, {
+    numberingSystem: language === "fa" ? "arabext" : "latn",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",

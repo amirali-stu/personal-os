@@ -5,15 +5,22 @@ import { useMusicPlayerStore } from "../../app/store/musicPlayerStore";
 
 export function MainContent() {
   const displayMode = useSettingsStore((state) => state.displayMode);
+  const language = useSettingsStore((state) => state.language);
 
   const currentTrack = useMusicPlayerStore((state) => state.currentTrack);
 
   const isCompact = displayMode === "compact";
-
   const hasPlayer = currentTrack !== null;
+  const isRtl = language === "fa";
 
   return (
-    <main dir="rtl" className="min-h-screen bg-[var(--color-bg)] lg:mr-[250px]">
+    <main
+      dir={isRtl ? "rtl" : "ltr"}
+      className={[
+        "min-h-screen bg-[var(--color-bg)]",
+        isRtl ? "lg:mr-[250px]" : "lg:ml-[250px]",
+      ].join(" ")}
+    >
       <div
         className={`
           mx-auto

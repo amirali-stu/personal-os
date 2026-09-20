@@ -1,17 +1,37 @@
+// components/MarketsHeader.tsx
 import { Activity } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { useSettingsStore } from "../../../app/store/settingsStore";
 
 type Props = {
   isOnline: boolean;
 };
 
 export function MarketsHeader({ isOnline }: Props) {
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+
+  const isRtl = language === "fa";
+
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-xl font-bold text-white">بازارها</h1>
+    <div
+      dir={isRtl ? "rtl" : "ltr"}
+      className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div className="text-start">
+        <h1 className="text-xl font-bold text-white">
+          {t("markets.title", {
+            defaultValue: isRtl ? "بازارها" : "Markets",
+          })}
+        </h1>
 
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-          بازارهای مهم و مورد علاقه شما
+          {t("markets.subtitle", {
+            defaultValue: isRtl
+              ? "بازارهای مهم و مورد علاقه شما"
+              : "Important markets and your favorites",
+          })}
         </p>
       </div>
 
@@ -34,7 +54,13 @@ export function MarketsHeader({ isOnline }: Props) {
 
         <Activity size={13} />
 
-        {isOnline ? "اتصال آنلاین" : "آخرین داده ذخیره‌شده"}
+        {isOnline
+          ? t("markets.online", {
+              defaultValue: isRtl ? "اتصال آنلاین" : "Online connection",
+            })
+          : t("markets.cached", {
+              defaultValue: isRtl ? "آخرین داده ذخیره‌شده" : "Last saved data",
+            })}
       </div>
     </div>
   );

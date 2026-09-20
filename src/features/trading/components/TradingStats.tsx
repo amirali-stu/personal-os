@@ -1,3 +1,5 @@
+// src/features/trading/components/TradingStats.tsx
+
 import {
   CalendarDays,
   CheckCircle2,
@@ -5,6 +7,9 @@ import {
   TrendingUp,
   XCircle,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import { formatResult } from "../utils";
 
 type Props = {
@@ -22,21 +27,45 @@ export function TradingStats({
   failedTrades,
   tradeLimit,
 }: Props) {
+  const { t } = useTranslation();
+
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, {
+      defaultValue: isRtl ? fa : en,
+    });
+
+  const formatNumber = (value: number) =>
+    value.toLocaleString(isRtl ? "fa-IR" : "en-US");
+
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div
+      dir={isRtl ? "rtl" : "ltr"}
+      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+    >
       <Stat
-        title="معاملات امروز"
-        value={`${todayCount} / ${tradeLimit}`}
+        title={text("tasks.stats.today", "معاملات امروز", "Today's Trades")}
+        value={`${formatNumber(todayCount)} / ${formatNumber(tradeLimit)}`}
         icon={<CalendarDays size={18} />}
         description={
           todayCount >= tradeLimit
-            ? "سقف روزانه تکمیل شده"
-            : "امکان ثبت معامله وجود دارد"
+            ? text(
+                "tasks.stats.limitReached",
+                "سقف روزانه تکمیل شده",
+                "Daily limit reached",
+              )
+            : text(
+                "tasks.stats.limitAvailable",
+                "امکان ثبت معامله وجود دارد",
+                "More trades can be recorded",
+              )
         }
       />
 
       <Stat
-        title="نتیجه کل"
+        title={text("tasks.stats.totalResult", "نتیجه کل", "Total Result")}
         value={formatResult(totalResult)}
         icon={
           totalResult >= 0 ? (
@@ -45,7 +74,11 @@ export function TradingStats({
             <TrendingDown size={18} />
           )
         }
-        description="جمع نتیجه معاملات"
+        description={text(
+          "tasks.stats.totalDescription",
+          "جمع نتیجه معاملات",
+          "Combined result of all trades",
+        )}
         valueClass={
           totalResult > 0
             ? "text-[var(--color-success)]"
@@ -56,18 +89,26 @@ export function TradingStats({
       />
 
       <Stat
-        title="معاملات موفق"
-        value={successfulTrades.toLocaleString("fa-IR")}
+        title={text("tasks.stats.successful", "معاملات موفق", "Winning Trades")}
+        value={formatNumber(successfulTrades)}
         icon={<CheckCircle2 size={18} />}
-        description="معامله با نتیجه مثبت"
+        description={text(
+          "tasks.stats.successfulDescription",
+          "معامله با نتیجه مثبت",
+          "Trades with positive results",
+        )}
         valueClass="text-[var(--color-success)]"
       />
 
       <Stat
-        title="معاملات ناموفق"
-        value={failedTrades.toLocaleString("fa-IR")}
+        title={text("tasks.stats.failed", "معاملات ناموفق", "Losing Trades")}
+        value={formatNumber(failedTrades)}
         icon={<XCircle size={18} />}
-        description="معامله با نتیجه منفی"
+        description={text(
+          "tasks.stats.failedDescription",
+          "معامله با نتیجه منفی",
+          "Trades with negative results",
+        )}
         valueClass="text-[var(--color-danger)]"
       />
     </div>
@@ -94,7 +135,7 @@ function Stat({
           {icon}
         </div>
 
-        <span className="text-[10px] text-[var(--color-text-muted)]">
+        <span className="text-end text-[10px] text-[var(--color-text-muted)]">
           {title}
         </span>
       </div>
@@ -103,7 +144,7 @@ function Stat({
         {value}
       </div>
 
-      <div className="mt-1 text-[10px] text-[var(--color-text-muted)]">
+      <div className="mt-1 text-start text-[10px] text-[var(--color-text-muted)]">
         {description}
       </div>
     </div>

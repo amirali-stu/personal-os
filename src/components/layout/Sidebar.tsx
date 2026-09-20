@@ -11,42 +11,44 @@ import {
   X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { useSettingsStore } from "../../app/store/settingsStore";
 
 type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
+  isRtl: boolean;
 };
 
 const navigationItems = [
   {
-    label: "داشبورد",
+    labelKey: "navigation.dashboard",
     icon: LayoutDashboard,
     path: "/",
   },
   {
-    label: "کارهای امروز",
+    labelKey: "navigation.tasks",
     icon: CheckSquare,
     path: "/tasks",
   },
   {
-    label: "ژورنال ترید",
+    labelKey: "navigation.trading",
     icon: ChartCandlestick,
     path: "/trading",
   },
   {
-    label: "بازارها",
+    labelKey: "navigation.markets",
     icon: TrendingUp,
     path: "/markets",
   },
   {
-    label: "موسیقی",
+    labelKey: "navigation.music",
     icon: Music2,
     path: "/music",
   },
   {
-    label: "دستیار هوش مصنوعی",
+    labelKey: "navigation.ai",
     icon: Bot,
     path: "/ai",
   },
@@ -86,7 +88,9 @@ function useOnlineStatus() {
   return isOnline;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, isRtl }: SidebarProps) {
+  const { t } = useTranslation();
+
   const timezone = useSettingsStore((state) => state.timezone);
 
   const isOnline = useOnlineStatus();
@@ -110,19 +114,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile backdrop */}
       {isOpen && (
         <button
-          aria-label="بستن منو"
+          aria-label={t("common.close")}
           onClick={onClose}
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] lg:hidden"
         />
       )}
 
       <aside
-        dir="rtl"
+        dir={isRtl ? "rtl" : "ltr"}
         className={[
-          "fixed right-0 top-0 z-50 flex h-screen w-[250px] flex-col",
-          "border-l border-[var(--color-border)] bg-[var(--color-sidebar)] p-4",
+          "fixed top-0 z-50 flex h-screen w-[250px] flex-col",
+          isRtl ? "right-0 border-l" : "left-0 border-r",
+          "border-[var(--color-border)] bg-[var(--color-sidebar)] p-4",
           "transition-transform duration-300",
-          isOpen ? "translate-x-0" : "translate-x-full",
+          isOpen
+            ? "translate-x-0"
+            : isRtl
+              ? "translate-x-full"
+              : "-translate-x-full",
           "lg:translate-x-0",
         ].join(" ")}
       >
@@ -133,10 +142,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-bold tracking-tight">سیستم شخصی</div>
+            <div className="text-sm font-bold tracking-tight">Personal OS</div>
 
             <div className="mt-0.5 text-[10px] text-[var(--color-text-muted)]">
-              فضای شخصی شما
+              {t("sidebar.personalSpace")}
             </div>
           </div>
 
@@ -144,7 +153,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <button
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-white lg:hidden"
-            aria-label="بستن منو"
+            aria-label={t("common.close")}
           >
             <X size={18} />
           </button>
@@ -153,7 +162,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Navigation */}
         <nav className="flex flex-col gap-1">
           <div className="mb-2 px-3 text-[10px] font-bold text-[var(--color-text-muted)]">
-            محیط کار
+            {t("navigation.workspace")}
           </div>
 
           {navigationItems.map((item) => {
@@ -178,7 +187,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <span className="absolute right-0 h-5 w-[3px] rounded-l-full bg-[var(--color-primary)] shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                      <span
+                        className={[
+                          "absolute h-5 w-[3px] rounded-full bg-[var(--color-primary)]",
+                          isRtl
+                            ? "right-0 rounded-l-full"
+                            : "left-0 rounded-r-full",
+                          "shadow-[0_0_10px_rgba(168,85,247,0.5)]",
+                        ].join(" ")}
+                      />
                     )}
 
                     <span
@@ -192,7 +209,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       <Icon size={18} strokeWidth={1.8} />
                     </span>
 
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium">{t(item.labelKey)}</span>
                   </>
                 )}
               </NavLink>
@@ -217,18 +234,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             }
           >
             <Settings size={18} strokeWidth={1.8} />
-            <span>تنظیمات</span>
+            <span>{t("navigation.settings")}</span>
           </NavLink>
 
           {/* User / Status / Clock */}
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface-hover)] text-[10px] font-bold">
-                من
+                {t("sidebar.me")}
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-semibold">فضای شخصی</div>
+                <div className="text-xs font-semibold">
+                  {t("sidebar.personalSpace")}
+                </div>
 
                 <div className="mt-0.5 flex items-center gap-1.5 text-[10px]">
                   <span
@@ -241,7 +260,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   />
 
                   <span className="text-[var(--color-text-muted)]">
-                    {isOnline ? "حالت آنلاین" : "حالت آفلاین"}
+                    {isOnline ? t("sidebar.online") : t("sidebar.offline")}
                   </span>
                 </div>
               </div>
@@ -251,7 +270,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="mt-2 flex items-center justify-between border-t border-[var(--color-border)] pt-2">
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] text-[var(--color-text-muted)]">
-                  {timezone === "utc" ? "UTC" : "محلی"}
+                  {timezone === "utc" ? t("sidebar.utc") : t("sidebar.local")}
                 </span>
 
                 <span

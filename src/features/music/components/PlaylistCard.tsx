@@ -1,6 +1,9 @@
+// components/PlaylistCard.tsx
 import { Edit3, ListMusic, MoreVertical, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import type { MusicPlaylist } from "../types";
 
 type Props = {
@@ -18,9 +21,15 @@ export function PlaylistCard({
   onEdit,
   onDelete,
 }: Props) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, { defaultValue: isRtl ? fa : en });
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -48,6 +57,7 @@ export function PlaylistCard({
 
   return (
     <div
+      dir={isRtl ? "rtl" : "ltr"}
       className="group relative cursor-pointer rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-all hover:border-[var(--color-border-hover)]"
       onClick={onOpen}
     >
@@ -56,7 +66,6 @@ export function PlaylistCard({
           <ListMusic size={21} />
         </div>
 
-        {/* Menu */}
         <div
           ref={menuRef}
           className="relative"
@@ -70,7 +79,11 @@ export function PlaylistCard({
                 ? "bg-[var(--color-surface-hover)] text-white"
                 : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:text-white"
             }`}
-            aria-label="عملیات لیست"
+            aria-label={text(
+              "music.playlistActions",
+              "عملیات لیست",
+              "Playlist actions",
+            )}
             aria-expanded={menuOpen}
           >
             <MoreVertical size={17} />
@@ -78,25 +91,27 @@ export function PlaylistCard({
 
           {menuOpen && (
             <div
-              className="absolute left-0 top-10 z-30 w-40 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 shadow-2xl shadow-black/40"
+              className={`absolute top-10 z-30 w-40 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 shadow-2xl shadow-black/40 ${
+                isRtl ? "right-0" : "left-0"
+              }`}
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={handleEdit}
-                className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-[11px] font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-white"
+                className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-start text-[11px] font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-hover)] hover:text-white"
               >
                 <Edit3 size={15} />
-                ویرایش
+                {text("music.edit", "ویرایش", "Edit")}
               </button>
 
               <button
                 type="button"
                 onClick={handleDelete}
-                className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-[11px] font-medium text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-start text-[11px] font-medium text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
               >
                 <Trash2 size={15} />
-                حذف لیست
+                {text("music.deletePlaylist", "حذف لیست", "Delete playlist")}
               </button>
             </div>
           )}
@@ -112,7 +127,7 @@ export function PlaylistCard({
         </h3>
 
         <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-          {trackCount} آهنگ
+          {trackCount} {text("music.track", "آهنگ", "tracks")}
         </p>
       </div>
     </div>

@@ -12,34 +12,26 @@ import {
   Trash2,
   Volume2,
 } from "lucide-react";
-import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
+import { useSettingsStore } from "../../app/store/settingsStore";
 import { SettingsSection } from "./components/SettingsSection";
 import { SettingsSelect } from "./components/SettingsSelect";
 import { SettingsToggle } from "./components/SettingsToggle";
-import { useSettingsStore } from "../../app/store/settingsStore";
 
 export function SettingsPage() {
+  const { t } = useTranslation();
+
   const accentColor = useSettingsStore((state) => state.accentColor);
-
   const darkMode = useSettingsStore((state) => state.darkMode);
-
   const displayMode = useSettingsStore((state) => state.displayMode);
-
   const language = useSettingsStore((state) => state.language);
-
   const dateFormat = useSettingsStore((state) => state.dateFormat);
-
   const timezone = useSettingsStore((state) => state.timezone);
-
   const autoPlay = useSettingsStore((state) => state.autoPlay);
-
   const defaultSpeed = useSettingsStore((state) => state.defaultSpeed);
-
   const marketUpdates = useSettingsStore((state) => state.marketUpdates);
-
   const tradeLimit = useSettingsStore((state) => state.tradeLimit);
-
   const aiLocalOnly = useSettingsStore((state) => state.aiLocalOnly);
 
   const updateSetting = useSettingsStore((state) => state.updateSetting);
@@ -54,10 +46,12 @@ export function SettingsPage() {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold text-white">تنظیمات</h1>
+            <h1 className="text-xl font-bold text-white">
+              {t("settings.title")}
+            </h1>
 
             <p className="mt-1 text-[11px] text-[var(--color-text-muted)]">
-              تنظیمات شخصی Personal OS
+              {t("settings.subtitle")}
             </p>
           </div>
         </div>
@@ -65,41 +59,41 @@ export function SettingsPage() {
 
       {/* Appearance */}
       <SettingsSection
-        title="ظاهر"
-        description="ظاهر و نحوه نمایش برنامه"
+        title={t("settings.appearance.title")}
+        description={t("settings.appearance.description")}
         icon={<Palette size={19} />}
       >
         <SettingsToggle
-          label="حالت تاریک"
-          description="استفاده از رابط کاربری تیره"
+          label={t("settings.appearance.darkMode.label")}
+          description={t("settings.appearance.darkMode.description")}
           checked={darkMode}
           onChange={(value) => updateSetting("darkMode", value)}
         />
 
         <SettingsSelect
-          label="رنگ اصلی"
-          description="رنگ اصلی رابط کاربری"
+          label={t("settings.appearance.accentColor.label")}
+          description={t("settings.appearance.accentColor.description")}
           value={accentColor}
           options={[
             {
               value: "violet",
-              label: "بنفش الکتریکی",
+              label: t("settings.appearance.accentColor.purple"),
             },
             {
               value: "blue",
-              label: "آبی تکنولوژیک",
+              label: t("settings.appearance.accentColor.blue"),
             },
             {
               value: "emerald",
-              label: "سبز زمردی",
+              label: t("settings.appearance.accentColor.emerald"),
             },
             {
               value: "amber",
-              label: "کهربایی",
+              label: t("settings.appearance.accentColor.amber"),
             },
             {
               value: "rose",
-              label: "رز",
+              label: t("settings.appearance.accentColor.rose"),
             },
           ]}
           onChange={(value) =>
@@ -111,17 +105,17 @@ export function SettingsPage() {
         />
 
         <SettingsSelect
-          label="نمایش"
-          description="نحوه نمایش رابط کاربری"
+          label={t("settings.appearance.displayMode.label")}
+          description={t("settings.appearance.displayMode.description")}
           value={displayMode}
           options={[
             {
               value: "desktop",
-              label: "استاندارد",
+              label: t("settings.appearance.displayMode.standard"),
             },
             {
               value: "compact",
-              label: "فشرده",
+              label: t("settings.appearance.displayMode.compact"),
             },
           ]}
           onChange={(value) =>
@@ -132,39 +126,39 @@ export function SettingsPage() {
 
       {/* Application */}
       <SettingsSection
-        title="برنامه"
-        description="تنظیمات عمومی Personal OS"
+        title={t("settings.application.title")}
+        description={t("settings.application.description")}
         icon={<Monitor size={19} />}
       >
         <SettingsSelect
-          label="زبان"
-          description="زبان رابط کاربری برنامه"
+          label={t("settings.application.language.label")}
+          description={t("settings.application.language.description")}
           value={language}
           options={[
             {
               value: "fa",
-              label: "فارسی",
+              label: t("settings.application.language.fa"),
             },
             {
               value: "en",
-              label: "English",
+              label: t("settings.application.language.en"),
             },
           ]}
           onChange={(value) => updateSetting("language", value as "fa" | "en")}
         />
 
         <SettingsSelect
-          label="فرمت تاریخ"
-          description="نحوه نمایش تاریخ‌ها"
+          label={t("settings.application.dateFormat.label")}
+          description={t("settings.application.dateFormat.description")}
           value={dateFormat}
           options={[
             {
               value: "jalali",
-              label: "شمسی",
+              label: t("settings.application.dateFormat.jalali"),
             },
             {
               value: "gregorian",
-              label: "میلادی",
+              label: t("settings.application.dateFormat.gregorian"),
             },
           ]}
           onChange={(value) =>
@@ -173,17 +167,17 @@ export function SettingsPage() {
         />
 
         <SettingsSelect
-          label="منطقه زمانی"
-          description="منطقه زمانی مورد استفاده برنامه"
+          label={t("settings.application.timezone.label")}
+          description={t("settings.application.timezone.description")}
           value={timezone}
           options={[
             {
               value: "local",
-              label: "زمان محلی دستگاه",
+              label: t("settings.application.timezone.local"),
             },
             {
               value: "utc",
-              label: "UTC",
+              label: t("settings.application.timezone.utc"),
             },
           ]}
           onChange={(value) =>
@@ -194,20 +188,20 @@ export function SettingsPage() {
 
       {/* Music */}
       <SettingsSection
-        title="موسیقی"
-        description="تنظیمات پخش موسیقی"
+        title={t("settings.music.title")}
+        description={t("settings.music.description")}
         icon={<Volume2 size={19} />}
       >
         <SettingsToggle
-          label="پخش خودکار"
-          description="بعد از انتخاب آهنگ، پخش به‌صورت خودکار شروع شود"
+          label={t("settings.music.autoPlay.label")}
+          description={t("settings.music.autoPlay.description")}
           checked={autoPlay}
           onChange={(value) => updateSetting("autoPlay", value)}
         />
 
         <SettingsSelect
-          label="سرعت پیش‌فرض"
-          description="سرعت اولیه پخش آهنگ‌ها"
+          label={t("settings.music.defaultSpeed.label")}
+          description={t("settings.music.defaultSpeed.description")}
           value={String(defaultSpeed)}
           options={[
             { value: "0.5", label: "0.5x" },
@@ -223,29 +217,29 @@ export function SettingsPage() {
 
       {/* Markets */}
       <SettingsSection
-        title="بازار"
-        description="تنظیمات مربوط به قیمت‌ها و بازار"
+        title={t("settings.markets.title")}
+        description={t("settings.markets.description")}
         icon={<Globe size={19} />}
       >
         <SettingsToggle
-          label="بروزرسانی خودکار"
-          description="دریافت خودکار آخرین قیمت‌های بازار"
+          label={t("settings.markets.autoUpdate.label")}
+          description={t("settings.markets.autoUpdate.description")}
           checked={marketUpdates}
           onChange={(value) => updateSetting("marketUpdates", value)}
         />
 
         <SettingsSelect
-          label="واحد پول"
-          description="واحد نمایش قیمت‌های داخلی"
+          label={t("settings.markets.currency.label")}
+          description={t("settings.markets.currency.description")}
           value="toman"
           options={[
             {
               value: "toman",
-              label: "تومان",
+              label: t("settings.markets.currency.toman"),
             },
             {
               value: "irr",
-              label: "ریال",
+              label: t("settings.markets.currency.rial"),
             },
           ]}
         />
@@ -253,30 +247,30 @@ export function SettingsPage() {
 
       {/* Trading */}
       <SettingsSection
-        title="ترید"
-        description="تنظیمات مربوط به ژورنال معاملاتی"
+        title={t("settings.trading.title")}
+        description={t("settings.trading.description")}
         icon={<ShieldCheck size={19} />}
       >
         <SettingsSelect
-          label="حداکثر معامله روزانه"
-          description="حداکثر تعداد معاملات قابل ثبت در یک روز"
+          label={t("settings.trading.tradeLimit.label")}
+          description={t("settings.trading.tradeLimit.description")}
           value={String(tradeLimit)}
           options={[
             {
               value: "1",
-              label: "۱ معامله",
+              label: t("settings.trading.trade", { count: 1 }),
             },
             {
               value: "2",
-              label: "۲ معامله",
+              label: t("settings.trading.trades", { count: 2 }),
             },
             {
               value: "3",
-              label: "۳ معامله",
+              label: t("settings.trading.trades", { count: 3 }),
             },
             {
               value: "5",
-              label: "۵ معامله",
+              label: t("settings.trading.trades", { count: 5 }),
             },
           ]}
           onChange={(value) => updateSetting("tradeLimit", Number(value))}
@@ -285,29 +279,29 @@ export function SettingsPage() {
 
       {/* AI */}
       <SettingsSection
-        title="هوش مصنوعی"
-        description="تنظیمات دستیار هوشمند"
+        title={t("settings.ai.title")}
+        description={t("settings.ai.description")}
         icon={<Bot size={19} />}
       >
         <SettingsToggle
-          label="حالت Local Only"
-          description="استفاده از مدل هوش مصنوعی روی دستگاه تا حد امکان"
+          label={t("settings.ai.localOnly.label")}
+          description={t("settings.ai.localOnly.description")}
           checked={aiLocalOnly}
           onChange={(value) => updateSetting("aiLocalOnly", value)}
         />
 
         <SettingsSelect
-          label="مدل پیش‌فرض"
-          description="مدل مورد استفاده دستیار هوشمند"
+          label={t("settings.ai.model.label")}
+          description={t("settings.ai.model.description")}
           value="local"
           options={[
             {
               value: "local",
-              label: "مدل Local",
+              label: t("settings.ai.model.local"),
             },
             {
               value: "cloud",
-              label: "مدل Cloud",
+              label: t("settings.ai.model.cloud"),
             },
           ]}
         />
@@ -315,8 +309,8 @@ export function SettingsPage() {
 
       {/* Data */}
       <SettingsSection
-        title="داده‌ها"
-        description="مدیریت اطلاعات ذخیره‌شده در برنامه"
+        title={t("settings.data.title")}
+        description={t("settings.data.description")}
         icon={<Database size={19} />}
       >
         <button
@@ -327,11 +321,11 @@ export function SettingsPage() {
 
           <div>
             <p className="text-xs font-medium text-white">
-              خروجی گرفتن از داده‌ها
+              {t("settings.data.export.label")}
             </p>
 
             <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-              دریافت یک نسخه پشتیبان از اطلاعات Personal OS
+              {t("settings.data.export.description")}
             </p>
           </div>
         </button>
@@ -343,10 +337,12 @@ export function SettingsPage() {
           <RotateCcw size={17} className="text-[var(--color-text-muted)]" />
 
           <div>
-            <p className="text-xs font-medium text-white">وارد کردن داده‌ها</p>
+            <p className="text-xs font-medium text-white">
+              {t("settings.data.import.label")}
+            </p>
 
             <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-              بازیابی اطلاعات از یک فایل پشتیبان
+              {t("settings.data.import.description")}
             </p>
           </div>
         </button>
@@ -358,10 +354,12 @@ export function SettingsPage() {
           <Trash2 size={17} className="text-red-400" />
 
           <div>
-            <p className="text-xs font-medium text-red-400">حذف تمام داده‌ها</p>
+            <p className="text-xs font-medium text-red-400">
+              {t("settings.data.delete.label")}
+            </p>
 
             <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-              تمام اطلاعات ذخیره‌شده از این دستگاه حذف خواهد شد
+              {t("settings.data.delete.description")}
             </p>
           </div>
         </button>
@@ -375,17 +373,19 @@ export function SettingsPage() {
           </div>
 
           <div>
-            <p className="text-xs font-bold text-white">Personal OS</p>
+            <p className="text-xs font-bold text-white">
+              {t("settings.about.name")}
+            </p>
 
             <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-              سیستم شخصی مدیریت زندگی، ترید، موسیقی و AI
+              {t("settings.about.description")}
             </p>
           </div>
         </div>
 
         <div className="mt-5 flex items-center gap-2 border-t border-[var(--color-border)] pt-4 text-[10px] text-[var(--color-text-muted)]">
           <Languages size={13} />
-          نسخه اولیه رابط کاربری
+          {t("settings.about.version")}
         </div>
       </section>
     </div>

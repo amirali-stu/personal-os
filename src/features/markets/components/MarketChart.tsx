@@ -1,3 +1,4 @@
+// components/MarketChart.tsx
 import {
   Area,
   AreaChart,
@@ -6,9 +7,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
-import type { MarketAsset } from "../types";
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import { useMarketHistory } from "../hooks/useMarketHistory";
+import type { MarketAsset } from "../types";
 
 type Props = {
   market: MarketAsset;
@@ -25,38 +28,47 @@ function formatPrice(value: number, market: MarketAsset) {
   return value.toLocaleString("fa-IR");
 }
 
-function formatTime(timestamp: number) {
-  return new Intl.DateTimeFormat("fa-IR", {
+function formatTime(timestamp: number, language: string) {
+  return new Intl.DateTimeFormat(language === "fa" ? "fa-IR" : "en-US", {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(timestamp));
 }
 
 export function MarketChart({ market }: Props) {
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+
+  const isRtl = language === "fa";
   const { history, isLoading } = useMarketHistory(market.id);
 
   const chartData = history.map((point) => ({
     timestamp: point.timestamp,
     price: point.price,
-    time: formatTime(point.timestamp),
+    time: formatTime(point.timestamp, language),
   }));
 
   return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+    <section
+      dir={isRtl ? "rtl" : "ltr"}
+      className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5"
+    >
       <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
+        <div className="text-start">
           <div dir="ltr" className="text-sm font-bold text-white">
             {market.symbol}
           </div>
 
           <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-            تاریخچه قیمت
+            {t("markets.priceHistory", {
+              defaultValue: isRtl ? "تاریخچه قیمت" : "Price history",
+            })}
           </p>
         </div>
 
         <div
           dir="ltr"
-          className="text-sm font-bold text-[var(--color-primary)]"
+          className="shrink-0 text-sm font-bold text-[var(--color-primary)]"
         >
           {formatPrice(market.price, market)}
         </div>
@@ -68,11 +80,19 @@ export function MarketChart({ market }: Props) {
         <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-[var(--color-border)]">
           <div className="text-center">
             <p className="text-xs font-medium text-[var(--color-text-secondary)]">
-              هنوز تاریخچه کافی نیست
+              {t("markets.insufficientHistory", {
+                defaultValue: isRtl
+                  ? "هنوز تاریخچه کافی نیست"
+                  : "Not enough history yet",
+              })}
             </p>
 
             <p className="mt-2 text-[10px] text-[var(--color-text-muted)]">
-              با بروزرسانی‌های بعدی نمودار ساخته می‌شود.
+              {t("markets.historyHint", {
+                defaultValue: isRtl
+                  ? "با بروزرسانی‌های بعدی نمودار ساخته می‌شود."
+                  : "The chart will build with future updates.",
+              })}
             </p>
           </div>
         </div>
@@ -150,9 +170,15 @@ export function MarketChart({ market }: Props) {
                 }}
                 formatter={(value) => [
                   formatPrice(Number(value), market),
-                  "قیمت",
+                  t("markets.price", {
+                    defaultValue: isRtl ? "قیمت" : "Price",
+                  }),
                 ]}
-                labelFormatter={(label) => `ساعت ${label}`}
+                labelFormatter={(label) =>
+                  `${t("markets.hour", {
+                    defaultValue: isRtl ? "ساعت" : "Time",
+                  })} ${label}`
+                }
               />
 
               <Area

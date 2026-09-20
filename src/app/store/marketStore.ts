@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { MarketAsset } from "../types";
+import type { MarketAsset } from "../../features/markets/types";
 
 type MarketStore = {
   assets: MarketAsset[];

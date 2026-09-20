@@ -1,7 +1,11 @@
+// TaskTooltip.tsx
+
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, Circle, X } from "lucide-react";
 
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import type { Task } from "../hooks/useTasks";
 
 type TaskTooltipProps = {
@@ -19,6 +23,11 @@ export function TaskTooltip({
   onMouseEnter,
   onMouseLeave,
 }: TaskTooltipProps) {
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+
+  const isRtl = language === "fa";
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -51,10 +60,14 @@ export function TaskTooltip({
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      dir="rtl"
+      dir={isRtl ? "rtl" : "ltr"}
     >
-      <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] text-right shadow-2xl">
-        {/* Header / Holiday */}
+      <div
+        className={[
+          "overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl",
+          isRtl ? "text-right" : "text-left",
+        ].join(" ")}
+      >
         {holidayName && (
           <div className="border-b border-red-500/20 bg-red-500/10 p-3">
             <div className="flex items-start gap-2">
@@ -63,7 +76,9 @@ export function TaskTooltip({
               </div>
 
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-red-400">تعطیل رسمی</p>
+                <p className="text-xs font-semibold text-red-400">
+                  {t("tasks.calendar.officialHoliday")}
+                </p>
 
                 <p className="mt-1 text-sm font-bold leading-6 text-red-300">
                   {holidayName}
@@ -73,22 +88,23 @@ export function TaskTooltip({
           </div>
         )}
 
-        {/* Tasks header */}
         {tasks.length > 0 && (
           <div className="border-b border-[var(--color-border)] px-3 py-2.5">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
-                کارهای این روز
+                {t("tasks.tooltip.title")}
               </span>
 
               <span className="text-[11px] text-[var(--color-text-muted)]">
-                {completed} از {total} انجام شده
+                {t("tasks.tooltip.completedCount", {
+                  completed,
+                  total,
+                })}
               </span>
             </div>
           </div>
         )}
 
-        {/* Scrollable tasks */}
         {tasks.length > 0 && (
           <div
             className={[

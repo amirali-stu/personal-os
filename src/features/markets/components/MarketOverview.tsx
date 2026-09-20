@@ -1,3 +1,7 @@
+// components/MarketOverview.tsx
+import { useTranslation } from "react-i18next";
+
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import type { MarketAsset } from "../types";
 import { MarketCard } from "./MarketCard";
 
@@ -38,13 +42,26 @@ function MarketCardSkeleton() {
 }
 
 export function MarketOverview({ markets, isLoading = false }: Props) {
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+
+  const isRtl = language === "fa";
+
   return (
-    <section>
-      <div className="mb-4">
-        <h2 className="text-sm font-bold text-white">بازارهای اصلی</h2>
+    <section dir={isRtl ? "rtl" : "ltr"}>
+      <div className="mb-4 text-start">
+        <h2 className="text-sm font-bold text-white">
+          {t("markets.mainMarkets", {
+            defaultValue: isRtl ? "بازارهای اصلی" : "Main markets",
+          })}
+        </h2>
 
         <p className="mt-1 text-[11px] text-[var(--color-text-muted)]">
-          مهم‌ترین قیمت‌های مورد استفاده شما
+          {t("markets.mainMarketsDescription", {
+            defaultValue: isRtl
+              ? "مهم‌ترین قیمت‌های مورد استفاده شما"
+              : "The most important prices you use",
+          })}
         </p>
       </div>
 

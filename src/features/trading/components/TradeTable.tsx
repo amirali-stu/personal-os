@@ -1,7 +1,13 @@
+// src/features/trading/components/TradeTable.tsx
+
 import { useEffect, useRef, useState } from "react";
 import { Trash2, TriangleAlert } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import type { Trade } from "../types";
 import { formatDate, formatResult, formatTime } from "../utils";
+
+import { useSettingsStore } from "../../../app/store/settingsStore";
 
 type Props = {
   trades: Trade[];
@@ -10,11 +16,23 @@ type Props = {
 };
 
 export function TradeTable({ trades, loading, onDelete }: Props) {
-  const [openReasonId, setOpenReasonId] = useState<number | null>(null);
+  const { t } = useTranslation();
 
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, {
+      defaultValue: isRtl ? fa : en,
+    });
+
+  const formatNumber = (value: number) =>
+    value.toLocaleString(isRtl ? "fa-IR" : "en-US");
+
+  const [openReasonId, setOpenReasonId] = useState<number | null>(null);
   const [deleteTrade, setDeleteTrade] = useState<Trade | null>(null);
 
-  const [tooltip, setTooltip] = useState<{
+  const [, setTooltip] = useState<{
     top: number;
     right: number;
   } | null>(null);
@@ -48,59 +66,105 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
 
   return (
     <>
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-        {/* Header */}
+      <section
+        dir={isRtl ? "rtl" : "ltr"}
+        className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]"
+      >
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-4">
-          <div>
-            <h2 className="text-sm font-bold text-white">معاملات ثبت‌شده</h2>
+          <div className="text-start">
+            <h2 className="text-sm font-bold text-white">
+              {text(
+                "tasks.tradeTable.title",
+                "معاملات ثبت‌شده",
+                "Recorded Trades",
+              )}
+            </h2>
 
             <p className="mt-1 text-[11px] text-[var(--color-text-muted)]">
-              تمام معاملات قبلی شما
+              {text(
+                "tasks.tradeTable.subtitle",
+                "تمام معاملات قبلی شما",
+                "All your previous trades",
+              )}
             </p>
           </div>
 
           <div className="rounded-lg bg-[var(--color-surface-hover)] px-3 py-1.5 text-[11px] text-[var(--color-text-secondary)]">
-            {trades.length.toLocaleString("fa-IR")} معامله
+            {formatNumber(trades.length)}{" "}
+            {text("tasks.tradeTable.trade", "معامله", "trades")}
           </div>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="py-16 text-center text-sm text-[var(--color-text-muted)]">
-            در حال بارگذاری معاملات...
+            {text(
+              "tasks.tradeTable.loading",
+              "در حال بارگذاری معاملات...",
+              "Loading trades...",
+            )}
           </div>
         ) : trades.length === 0 ? (
           <div className="py-16 text-center">
             <div className="text-sm font-semibold text-white">
-              هنوز معامله‌ای ثبت نشده
+              {text(
+                "tasks.tradeTable.emptyTitle",
+                "هنوز معامله‌ای ثبت نشده",
+                "No trades recorded yet",
+              )}
             </div>
 
             <div className="mt-1 text-xs text-[var(--color-text-muted)]">
-              اولین معامله خودت را ثبت کن.
+              {text(
+                "tasks.tradeTable.emptyDescription",
+                "اولین معامله خودت را ثبت کن.",
+                "Record your first trade.",
+              )}
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[850px] table-fixed text-right">
+            <table className="w-full min-w-[850px] table-fixed text-start">
               <thead>
                 <tr className="border-b border-[var(--color-border)] text-[10px] text-[var(--color-text-muted)]">
-                  <th className="w-[110px] px-5 py-3 font-medium">نماد</th>
-
-                  <th className="w-[280px] px-5 py-3 font-medium">علت ورود</th>
-
-                  <th className="w-[90px] px-5 py-3 font-medium">نوع</th>
-
-                  <th className="w-[120px] px-5 py-3 font-medium">
-                    نتیجه مالی
+                  <th className="w-[110px] px-5 py-3 text-start font-medium">
+                    {text("tasks.tradeTable.symbol", "نماد", "Symbol")}
                   </th>
 
-                  <th className="w-[100px] px-5 py-3 font-medium">امتیاز</th>
+                  <th className="w-[280px] px-5 py-3 text-start font-medium">
+                    {text(
+                      "tasks.tradeTable.reason",
+                      "علت ورود",
+                      "Entry Reason",
+                    )}
+                  </th>
 
-                  <th className="w-[110px] px-5 py-3 font-medium">تاریخ</th>
+                  <th className="w-[90px] px-5 py-3 text-start font-medium">
+                    {text("tasks.tradeTable.side", "نوع", "Side")}
+                  </th>
 
-                  <th className="w-[80px] px-5 py-3 font-medium">ساعت</th>
+                  <th className="w-[120px] px-5 py-3 text-start font-medium">
+                    {text(
+                      "tasks.tradeTable.result",
+                      "نتیجه مالی",
+                      "Financial Result",
+                    )}
+                  </th>
 
-                  <th className="w-[70px] px-5 py-3 font-medium">حذف</th>
+                  <th className="w-[100px] px-5 py-3 text-start font-medium">
+                    {text("tasks.tradeTable.score", "امتیاز", "Score")}
+                  </th>
+
+                  <th className="w-[110px] px-5 py-3 text-start font-medium">
+                    {text("tasks.tradeTable.date", "تاریخ", "Date")}
+                  </th>
+
+                  <th className="w-[80px] px-5 py-3 text-start font-medium">
+                    {text("tasks.tradeTable.time", "ساعت", "Time")}
+                  </th>
+
+                  <th className="w-[70px] px-5 py-3 text-start font-medium">
+                    {text("tasks.tradeTable.delete", "حذف", "Delete")}
+                  </th>
                 </tr>
               </thead>
 
@@ -110,7 +174,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                     key={trade.id}
                     className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-surface-hover)]"
                   >
-                    {/* Symbol */}
                     <td className="px-5 py-4">
                       <span
                         dir="ltr"
@@ -120,7 +183,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                       </span>
                     </td>
 
-                    {/* Reason */}
                     <td className="px-5 py-4">
                       <ReasonCell
                         trade={trade}
@@ -130,7 +192,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                       />
                     </td>
 
-                    {/* Side */}
                     <td className="px-5 py-4">
                       <span
                         className={[
@@ -140,11 +201,12 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                             : "bg-[rgba(239,68,68,0.1)] text-[var(--color-danger)]",
                         ].join(" ")}
                       >
-                        {trade.side === "buy" ? "خرید" : "فروش"}
+                        {trade.side === "buy"
+                          ? text("tasks.tradeForm.buy", "خرید", "Buy")
+                          : text("tasks.tradeForm.sell", "فروش", "Sell")}
                       </span>
                     </td>
 
-                    {/* Result */}
                     <td className="px-5 py-4">
                       <span
                         dir="ltr"
@@ -161,7 +223,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                       </span>
                     </td>
 
-                    {/* Score */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((value) => (
@@ -178,17 +239,14 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                       </div>
                     </td>
 
-                    {/* Date */}
                     <td className="px-5 py-4 font-mono text-xs text-[var(--color-text-secondary)]">
                       {formatDate(trade.date)}
                     </td>
 
-                    {/* Time */}
                     <td className="px-5 py-4 text-xs text-[var(--color-text-muted)]">
                       {formatTime(trade.createdAt)}
                     </td>
 
-                    {/* Delete */}
                     <td className="px-5 py-4">
                       <button
                         type="button"
@@ -197,7 +255,11 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
                           setDeleteTrade(trade);
                         }}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-[rgba(239,68,68,0.1)] hover:text-[var(--color-danger)]"
-                        aria-label="حذف معامله"
+                        aria-label={text(
+                          "tasks.tradeTable.deleteTrade",
+                          "حذف معامله",
+                          "Delete trade",
+                        )}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -210,7 +272,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
         )}
       </section>
 
-      {/* Reason */}
       {selectedTrade && openReasonId !== null && (
         <ReasonTooltip
           trade={selectedTrade}
@@ -220,7 +281,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
         />
       )}
 
-      {/* Delete */}
       {deleteTrade && (
         <DeleteModal
           trade={deleteTrade}
@@ -231,10 +291,6 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
     </>
   );
 }
-
-/* =========================================================
-   Reason Cell
-========================================================= */
 
 function ReasonCell({
   trade,
@@ -266,7 +322,7 @@ function ReasonCell({
       ref={buttonRef}
       type="button"
       onClick={handleClick}
-      className="group block w-full cursor-pointer text-right"
+      className="group block w-full cursor-pointer text-start"
     >
       <span className="block truncate text-xs leading-6 text-[var(--color-text-secondary)] transition-colors group-hover:text-white">
         {trade.reason}
@@ -274,10 +330,6 @@ function ReasonCell({
     </button>
   );
 }
-
-/* =========================================================
-   Reason Tooltip / Mobile Modal
-========================================================= */
 
 function ReasonTooltip({
   trade,
@@ -288,6 +340,15 @@ function ReasonTooltip({
   right: number;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, {
+      defaultValue: isRtl ? fa : en,
+    });
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -303,49 +364,63 @@ function ReasonTooltip({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-5">
-      {/* Backdrop */}
+    <div
+      dir={isRtl ? "rtl" : "ltr"}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-5"
+    >
       <button
         type="button"
-        aria-label="بستن توضیحات"
+        aria-label={text(
+          "tasks.tradeTable.closeDescription",
+          "بستن توضیحات",
+          "Close description",
+        )}
         onClick={onClose}
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
       />
 
-      {/* Modal */}
       <div className="relative w-full max-w-[440px] animate-[reasonModalIn_180ms_ease-out] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-sidebar)] shadow-[0_25px_80px_rgba(0,0,0,0.7)]">
-        {/* Purple glow */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-[rgba(168,85,247,0.12)] blur-3xl" />
+        <div
+          className={[
+            "pointer-events-none absolute -top-20 h-40 w-40 rounded-full bg-[rgba(168,85,247,0.12)] blur-3xl",
+            isRtl ? "-right-20" : "-left-20",
+          ].join(" ")}
+        />
 
         <div className="relative p-6">
-          {/* Header */}
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="text-start">
               <div className="text-[10px] font-semibold text-[var(--color-primary)]">
-                علت ورود
+                {text(
+                  "tasks.tradeTable.entryReason",
+                  "علت ورود",
+                  "Entry Reason",
+                )}
               </div>
 
               <h3 className="mt-1 text-sm font-bold text-white">
-                توضیحات معامله
+                {text(
+                  "tasks.tradeTable.tradeDescription",
+                  "توضیحات معامله",
+                  "Trade Description",
+                )}
               </h3>
             </div>
 
-            {/* Close */}
             <button
               type="button"
               onClick={onClose}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)] transition-all hover:border-[var(--color-border-hover)] hover:bg-[var(--color-surface-hover)] hover:text-white"
-              aria-label="بستن"
+              aria-label={text("common.close", "بستن", "Close")}
             >
               <span className="text-lg leading-none">×</span>
             </button>
           </div>
 
-          {/* Trade info */}
           <div className="mt-5 flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
-            <div>
+            <div className="text-start">
               <div className="text-[10px] text-[var(--color-text-muted)]">
-                نماد
+                {text("tasks.tradeTable.symbol", "نماد", "Symbol")}
               </div>
 
               <div
@@ -356,9 +431,9 @@ function ReasonTooltip({
               </div>
             </div>
 
-            <div className="text-left">
+            <div className="text-end">
               <div className="text-[10px] text-[var(--color-text-muted)]">
-                نوع
+                {text("tasks.tradeTable.side", "نوع", "Side")}
               </div>
 
               <div
@@ -369,34 +444,31 @@ function ReasonTooltip({
                     : "text-[var(--color-danger)]",
                 ].join(" ")}
               >
-                {trade.side === "buy" ? "خرید" : "فروش"}
+                {trade.side === "buy"
+                  ? text("tasks.tradeForm.buy", "خرید", "Buy")
+                  : text("tasks.tradeForm.sell", "فروش", "Sell")}
               </div>
             </div>
           </div>
 
-          {/* Reason */}
           <div className="mt-4 max-h-[50vh] overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <p className="whitespace-pre-wrap break-words text-xs leading-7 text-[var(--color-text-secondary)]">
+            <p className="whitespace-pre-wrap break-words text-start text-xs leading-7 text-[var(--color-text-secondary)]">
               {trade.reason}
             </p>
           </div>
 
-          {/* Close button */}
           <button
             type="button"
             onClick={onClose}
             className="mt-4 w-full rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-[var(--color-primary-hover)]"
           >
-            بستن
+            {text("common.close", "بستن", "Close")}
           </button>
         </div>
       </div>
     </div>
   );
 }
-/* =========================================================
-   Delete Modal
-========================================================= */
 
 function DeleteModal({
   trade,
@@ -407,6 +479,16 @@ function DeleteModal({
   onCancel: () => void;
   onConfirm: () => Promise<void>;
 }) {
+  const { t } = useTranslation();
+
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, {
+      defaultValue: isRtl ? fa : en,
+    });
+
   const [deleting, setDeleting] = useState(false);
 
   async function handleConfirm() {
@@ -434,11 +516,13 @@ function DeleteModal({
   }, [deleting, onCancel]);
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-      {/* Backdrop */}
+    <div
+      dir={isRtl ? "rtl" : "ltr"}
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
+    >
       <button
         type="button"
-        aria-label="بستن"
+        aria-label={text("common.close", "بستن", "Close")}
         onClick={() => {
           if (!deleting) {
             onCancel();
@@ -447,30 +531,39 @@ function DeleteModal({
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
       />
 
-      {/* Modal */}
       <div className="relative w-full max-w-[420px] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-sidebar)] shadow-[0_25px_80px_rgba(0,0,0,0.65)]">
-        {/* Purple glow */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-[rgba(168,85,247,0.12)] blur-3xl" />
+        <div
+          className={[
+            "pointer-events-none absolute -top-20 h-40 w-40 rounded-full bg-[rgba(168,85,247,0.12)] blur-3xl",
+            isRtl ? "-right-20" : "-left-20",
+          ].join(" ")}
+        />
 
         <div className="relative p-6">
-          {/* Icon */}
           <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(239,68,68,0.1)] text-[var(--color-danger)]">
             <TriangleAlert size={21} strokeWidth={1.8} />
           </div>
 
-          {/* Title */}
-          <h3 className="text-base font-bold text-white">حذف معامله؟</h3>
+          <h3 className="text-start text-base font-bold text-white">
+            {text(
+              "tasks.tradeTable.deleteTitle",
+              "حذف معامله؟",
+              "Delete trade?",
+            )}
+          </h3>
 
-          <p className="mt-2 text-xs leading-6 text-[var(--color-text-secondary)]">
-            این معامله برای همیشه از ژورنال حذف می‌شود و امکان بازگردانی آن وجود
-            ندارد.
+          <p className="mt-2 text-start text-xs leading-6 text-[var(--color-text-secondary)]">
+            {text(
+              "tasks.tradeTable.deleteDescription",
+              "این معامله برای همیشه از ژورنال حذف می‌شود و امکان بازگردانی آن وجود ندارد.",
+              "This trade will be permanently removed from the journal and cannot be restored.",
+            )}
           </p>
 
-          {/* Trade preview */}
           <div className="mt-5 flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
-            <div>
+            <div className="text-start">
               <div className="text-[10px] text-[var(--color-text-muted)]">
-                نماد
+                {text("tasks.tradeTable.symbol", "نماد", "Symbol")}
               </div>
 
               <div
@@ -481,9 +574,9 @@ function DeleteModal({
               </div>
             </div>
 
-            <div className="text-left">
+            <div className="text-end">
               <div className="text-[10px] text-[var(--color-text-muted)]">
-                نتیجه
+                {text("tasks.tradeTable.result", "نتیجه", "Result")}
               </div>
 
               <div
@@ -502,7 +595,6 @@ function DeleteModal({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="mt-6 flex gap-3">
             <button
               type="button"
@@ -510,7 +602,7 @@ function DeleteModal({
               disabled={deleting}
               className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-all hover:border-[var(--color-border-hover)] hover:bg-[var(--color-surface-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              انصراف
+              {text("common.cancel", "انصراف", "Cancel")}
             </button>
 
             <button
@@ -521,7 +613,17 @@ function DeleteModal({
             >
               <Trash2 size={15} />
 
-              {deleting ? "در حال حذف..." : "حذف معامله"}
+              {deleting
+                ? text(
+                    "tasks.tradeTable.deleting",
+                    "در حال حذف...",
+                    "Deleting...",
+                  )
+                : text(
+                    "tasks.tradeTable.deleteTrade",
+                    "حذف معامله",
+                    "Delete Trade",
+                  )}
             </button>
           </div>
         </div>

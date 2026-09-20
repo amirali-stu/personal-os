@@ -1,9 +1,11 @@
+// TaskCalendar.tsx
+
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Holidays from "date-holidays";
 
 import { useSettingsStore } from "../../../app/store/settingsStore";
-import type { DateFormat, Timezone } from "../../../lib/dateUtils";
 import type { Task } from "../hooks/useTasks";
 import { TaskCalendarDay } from "./TaskCalendarDay";
 
@@ -30,7 +32,7 @@ const persianMonthFormatter = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
   year: "numeric",
 });
 
-const gregorianMonthFormatter = new Intl.DateTimeFormat("fa-IR", {
+const gregorianMonthFormatter = new Intl.DateTimeFormat("en-US", {
   calendar: "gregory",
   month: "long",
   year: "numeric",
@@ -146,24 +148,18 @@ function getSaturdayBasedWeekday(date: Date) {
   return (date.getDay() + 1) % 7;
 }
 
-const weekdays = [
-  "شنبه",
-  "یکشنبه",
-  "دوشنبه",
-  "سه‌شنبه",
-  "چهارشنبه",
-  "پنجشنبه",
-  "جمعه",
-];
-
-function formatGregorianDay(date: Date) {
-  return new Intl.NumberFormat("fa-IR").format(date.getDate());
+function formatGregorianDay(date: Date, language: string) {
+  return new Intl.NumberFormat(language === "fa" ? "fa-IR" : "en-US").format(
+    date.getDate(),
+  );
 }
 
-function formatPersianDay(date: Date) {
+function formatPersianDay(date: Date, language: string) {
   const persian = getPersianDate(date);
 
-  return new Intl.NumberFormat("fa-IR").format(persian.day);
+  return new Intl.NumberFormat(language === "fa" ? "fa-IR" : "en-US").format(
+    persian.day,
+  );
 }
 
 export function TaskCalendar({
@@ -171,9 +167,13 @@ export function TaskCalendar({
   selectedDate,
   onSelectDate,
 }: TaskCalendarProps) {
-  const dateFormat = useSettingsStore((state) => state.dateFormat);
+  const { t, i18n } = useTranslation();
 
+  const dateFormat = useSettingsStore((state) => state.dateFormat);
   const timezone = useSettingsStore((state) => state.timezone);
+  const language = useSettingsStore((state) => state.language);
+
+  const isRtl = language === "fa";
 
   const selectedDateObject = parseDateKey(selectedDate);
 
@@ -185,11 +185,6 @@ export function TaskCalendar({
     ),
   );
 
-  /*
-   * وقتی فرمت تاریخ در Settings تغییر می‌کند،
-   * تقویم را روی ماه مربوط به تاریخ انتخاب‌شده
-   * دوباره تنظیم می‌کنیم.
-   */
   useEffect(() => {
     setCurrentMonth(
       new Date(
@@ -276,11 +271,43 @@ export function TaskCalendar({
 
   const monthTitle =
     dateFormat === "jalali"
-      ? persianMonthFormatter.format(currentMonth)
-      : gregorianMonthFormatter.format(currentMonth);
+      ? new Intl.DateTimeFormat(
+          i18n.language === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian",
+          {
+            month: "long",
+            year: "numeric",
+          },
+        ).format(currentMonth)
+      : new Intl.DateTimeFormat(i18n.language === "fa" ? "fa-IR" : "en-US", {
+          calendar: "gregory",
+          month: "long",
+          year: "numeric",
+        }).format(currentMonth);
+
+  const weekdays =
+    language === "fa"
+      ? [
+          t("tasks.calendar.weekdays.saturday"),
+          t("tasks.calendar.weekdays.sunday"),
+          t("tasks.calendar.weekdays.monday"),
+          t("tasks.calendar.weekdays.tuesday"),
+          t("tasks.calendar.weekdays.wednesday"),
+          t("tasks.calendar.weekdays.thursday"),
+          t("tasks.calendar.weekdays.friday"),
+        ]
+      : [
+          t("tasks.calendar.weekdays.saturday"),
+          t("tasks.calendar.weekdays.sunday"),
+          t("tasks.calendar.weekdays.monday"),
+          t("tasks.calendar.weekdays.tuesday"),
+          t("tasks.calendar.weekdays.wednesday"),
+          t("tasks.calendar.weekdays.thursday"),
+          t("tasks.calendar.weekdays.friday"),
+        ];
 
   return (
     <section
+      dir={isRtl ? "rtl" : "ltr"}
       className="
         relative z-20
         overflow-visible
@@ -290,13 +317,12 @@ export function TaskCalendar({
         p-5
       "
     >
-      {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="font-bold">تقویم تسک‌ها</h2>
+          <h2 className="font-bold">{t("tasks.calendar.title")}</h2>
 
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            وضعیت کارها در طول ماه
+            {t("tasks.calendar.subtitle")}
           </p>
         </div>
 
@@ -304,7 +330,7 @@ export function TaskCalendar({
           <button
             type="button"
             onClick={goToPreviousMonth}
-            aria-label="ماه قبل"
+            aria-label={t("tasks.calendar.previousMonth")}
             className="
               flex h-9 w-9 items-center justify-center
               rounded-lg
@@ -314,7 +340,7 @@ export function TaskCalendar({
               hover:text-white
             "
           >
-            <ChevronRight size={18} />
+            {isRtl ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
 
           <button
@@ -330,13 +356,13 @@ export function TaskCalendar({
               hover:text-white
             "
           >
-            امروز
+            {t("tasks.calendar.today")}
           </button>
 
           <button
             type="button"
             onClick={goToNextMonth}
-            aria-label="ماه بعد"
+            aria-label={t("tasks.calendar.nextMonth")}
             className="
               flex h-9 w-9 items-center justify-center
               rounded-lg
@@ -346,17 +372,15 @@ export function TaskCalendar({
               hover:text-white
             "
           >
-            <ChevronLeft size={18} />
+            {isRtl ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
           </button>
         </div>
       </div>
 
-      {/* Month */}
       <div className="mt-6 text-center">
         <h3 className="text-lg font-bold">{monthTitle}</h3>
       </div>
 
-      {/* Weekdays */}
       <div className="mt-5 grid grid-cols-7 gap-1.5 sm:gap-2">
         {weekdays.map((weekday) => (
           <div
@@ -376,7 +400,6 @@ export function TaskCalendar({
         ))}
       </div>
 
-      {/* Days */}
       <div
         className="
           relative z-30
@@ -400,8 +423,8 @@ export function TaskCalendar({
 
           const dayNumber =
             dateFormat === "jalali"
-              ? formatPersianDay(date)
-              : formatGregorianDay(date);
+              ? formatPersianDay(date, language)
+              : formatGregorianDay(date, language);
 
           return (
             <TaskCalendarDay
@@ -419,20 +442,18 @@ export function TaskCalendar({
         })}
       </div>
 
-      {/* Holiday explanation */}
       <div className="mt-4 flex items-center gap-2 border-t border-[var(--color-border)] pt-4">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+        <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
 
         <span className="text-xs text-[var(--color-text-secondary)]">
-          تعطیل رسمی
+          {t("tasks.calendar.officialHoliday")}
         </span>
 
         <span className="text-xs text-[var(--color-text-muted)]">
-          — برای مشاهده علت تعطیلی روی روز هاور کن
+          — {t("tasks.calendar.hoverHoliday")}
         </span>
       </div>
 
-      {/* Legend */}
       <div
         className="
           mt-5 flex flex-wrap items-center gap-4
@@ -442,21 +463,23 @@ export function TaskCalendar({
       >
         <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-muted)]">
           <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
-          انجام شده
+          {t("tasks.calendar.completed")}
         </div>
 
         <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-muted)]">
           <span className="h-2 w-2 rounded-full bg-[var(--color-text-muted)]" />
-          باقی‌مانده
+          {t("tasks.calendar.remaining")}
         </div>
 
         <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-muted)]">
           <span className="h-2.5 w-2.5 rounded-md border border-red-500/50 bg-red-500/20" />
-          تعطیلی رسمی
+          {t("tasks.calendar.officialHoliday")}
         </div>
 
-        <div className="mr-auto text-[10px] text-[var(--color-text-muted)]">
-          برای مشاهده جزئیات روی روز هاور کن
+        <div className={isRtl ? "mr-auto" : "ml-auto"}>
+          <span className="text-[10px] text-[var(--color-text-muted)]">
+            {t("tasks.calendar.hoverDetails")}
+          </span>
         </div>
       </div>
     </section>

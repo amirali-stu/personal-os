@@ -99,17 +99,18 @@ export function useAudioPlayer() {
    * تغییر موزیک
    */
   useEffect(() => {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return;
-    }
-
     const loadId = ++loadIdRef.current;
 
     isLoadingRef.current = true;
 
     async function loadTrack() {
+      const audio = audioRef.current;
+
+      if (!audio) {
+        isLoadingRef.current = false;
+        return;
+      }
+
       /*
        * توقف موزیک قبلی
        */
@@ -226,7 +227,6 @@ export function useAudioPlayer() {
    */
   useEffect(() => {
     const audio = audioRef.current;
-
     if (!audio) {
       return;
     }

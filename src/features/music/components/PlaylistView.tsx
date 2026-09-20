@@ -1,7 +1,10 @@
+// components/PlaylistView.tsx
 import { ArrowRight, Music2 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useMusicPlayerStore } from "../../../app/store/musicPlayerStore";
+import { useSettingsStore } from "../../../app/store/settingsStore";
 import type { MusicPlaylist, MusicTrack } from "../types";
 
 import { AddTrackPanel } from "./AddTrackPanel";
@@ -23,15 +26,20 @@ export function PlaylistView({
   onAddTrack,
   onDeleteTrack,
 }: Props) {
-  const [trackToDelete, setTrackToDelete] = useState<MusicTrack | null>(null);
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+  const isRtl = language === "fa";
 
+  const [trackToDelete, setTrackToDelete] = useState<MusicTrack | null>(null);
   const [deletingTrack, setDeletingTrack] = useState(false);
 
   const currentTrack = useMusicPlayerStore((state) => state.currentTrack);
-
   const clearPlayer = useMusicPlayerStore((state) => state.clearPlayer);
 
   const playerActive = Boolean(currentTrack);
+
+  const text = (key: string, fa: string, en: string) =>
+    t(key, { defaultValue: isRtl ? fa : en });
 
   async function handleConfirmDelete() {
     if (!trackToDelete?.id) {
@@ -41,17 +49,11 @@ export function PlaylistView({
     setDeletingTrack(true);
 
     try {
-      /*
-       * اگر آهنگی که قرار است حذف شود
-       * همان آهنگ در حال پخش است،
-       * ابتدا Player را متوقف و پاک می‌کنیم.
-       */
       if (currentTrack?.id === trackToDelete.id) {
         clearPlayer();
       }
 
       await onDeleteTrack(trackToDelete.id);
-
       setTrackToDelete(null);
     } finally {
       setDeletingTrack(false);
@@ -59,18 +61,24 @@ export function PlaylistView({
   }
 
   return (
-    <div className={`space-y-6 ${playerActive ? "pb-20" : ""}`}>
-      {/* Header */}
+    <div
+      dir={isRtl ? "rtl" : "ltr"}
+      className={`space-y-6 ${playerActive ? "pb-20" : ""}`}
+    >
       <section>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
             className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-muted)] transition-all hover:border-[var(--color-border-hover)] hover:bg-[var(--color-surface-hover)] hover:text-white active:scale-95"
-            aria-label="بازگشت به کتابخانه"
-            title="بازگشت"
+            aria-label={text(
+              "music.backToLibrary",
+              "بازگشت به کتابخانه",
+              "Back to library",
+            )}
+            title={text("music.back", "بازگشت", "Back")}
           >
-            <ArrowRight size={18} />
+            <ArrowRight size={18} className={isRtl ? "" : "rotate-180"} />
           </button>
 
           <div className="min-w-0">
@@ -82,25 +90,37 @@ export function PlaylistView({
             </h1>
 
             <p className="mt-1 text-[11px] text-[var(--color-text-muted)]">
-              {tracks.length} آهنگ
+              {tracks.length} {text("music.track", "آهنگ", "tracks")}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Add Track */}
       <AddTrackPanel playlistId={playlist.id!} onAddTrack={onAddTrack} />
 
-      {/* Tracks */}
       <section>
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-white">آهنگ‌های این لیست</h2>
+            <h2 className="text-sm font-bold text-white">
+              {text(
+                "music.playlistTracks",
+                "آهنگ‌های این لیست",
+                "Playlist tracks",
+              )}
+            </h2>
 
             <p className="mt-1 text-[11px] text-[var(--color-text-muted)]">
               {tracks.length === 0
-                ? "هنوز آهنگی به این لیست اضافه نشده"
-                : `${tracks.length} آهنگ در این لیست`}
+                ? text(
+                    "music.noTracksDescription",
+                    "هنوز آهنگی به این لیست اضافه نشده",
+                    "No tracks have been added to this playlist yet",
+                  )
+                : `${tracks.length} ${text(
+                    "music.tracksInThisPlaylist",
+                    "آهنگ در این لیست",
+                    "tracks in this playlist",
+                  )}`}
             </p>
           </div>
         </div>
@@ -112,11 +132,19 @@ export function PlaylistView({
             </div>
 
             <p className="mt-4 text-sm font-bold text-white">
-              هنوز آهنگی اینجا نیست
+              {text(
+                "music.noTracks",
+                "هنوز آهنگی اینجا نیست",
+                "No tracks here yet",
+              )}
             </p>
 
             <p className="mt-2 text-[11px] text-[var(--color-text-muted)]">
-              از بخش بالا اولین آهنگت را اضافه کن
+              {text(
+                "music.addFirstTrack",
+                "از بخش بالا اولین آهنگت را اضافه کن",
+                "Add your first track from the section above",
+              )}
             </p>
           </div>
         ) : (
@@ -133,7 +161,6 @@ export function PlaylistView({
         )}
       </section>
 
-      {/* Delete Track Modal */}
       {trackToDelete && (
         <DeleteTrackModal
           trackTitle={trackToDelete.title}
@@ -143,7 +170,7 @@ export function PlaylistView({
               setTrackToDelete(null);
             }
           }}
-          onConfirm={handleConfirmDelete}
+          onConfirm={() => void handleConfirmDelete()}
         />
       )}
     </div>

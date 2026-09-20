@@ -1,5 +1,7 @@
-import { useState } from "react";
+// TasksPage.tsx
 
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Check, CheckCircle2, Plus, Trash2 } from "lucide-react";
 
 import { useTasks, type Task } from "./hooks/useTasks";
@@ -7,6 +9,8 @@ import { TaskCalendar } from "./components/TaskCalendar";
 import { getTodayDate } from "../../lib/dateUtils";
 
 export function TasksPage() {
+  const { t } = useTranslation();
+
   const { tasks, filter, setFilter, addTask, toggleTask, deleteTask } =
     useTasks();
 
@@ -16,14 +20,8 @@ export function TasksPage() {
   const today = getTodayDate();
   const isTodaySelected = selectedDate === today;
 
-  /*
-   * Tasks for selected date
-   */
   const selectedTasks = tasks.filter((task) => task.date === selectedDate);
 
-  /*
-   * Progress for selected date
-   */
   const selectedCompletedCount = selectedTasks.filter(
     (task) => task.completed,
   ).length;
@@ -35,9 +33,6 @@ export function TasksPage() {
       ? Math.round((selectedCompletedCount / selectedTotalCount) * 100)
       : 0;
 
-  /*
-   * Filter tasks for selected date
-   */
   const selectedVisibleTasks = selectedTasks.filter((task) => {
     if (filter === "active") {
       return !task.completed;
@@ -57,37 +52,34 @@ export function TasksPage() {
       return;
     }
 
-    // Task can only be added to today
     addTask(title);
-
     setNewTask("");
   }
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
-      {/* Header */}
       <section>
         <p className="mb-2 text-sm text-[var(--color-primary)]">
-          برنامه روزانه
+          {t("tasks.dailyPlan")}
         </p>
 
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          {isTodaySelected ? "کارهای امروز" : "کارهای روز انتخاب‌شده"}
+          {isTodaySelected
+            ? t("tasks.todayTitle")
+            : t("tasks.selectedDayTitle")}
         </h1>
 
         <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-          کارهای روزانه‌ات را مدیریت و پیگیری کن.
+          {t("tasks.subtitle")}
         </p>
       </section>
 
-      {/* Calendar */}
       <TaskCalendar
         tasks={tasks}
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
       />
 
-      {/* Add task - Today only */}
       {isTodaySelected && (
         <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -99,7 +91,7 @@ export function TasksPage() {
                   handleAddTask();
                 }
               }}
-              placeholder="کار جدید را وارد کن..."
+              placeholder={t("tasks.newTaskPlaceholder")}
               className="h-11 flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 text-sm text-white outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)] max-md:py-3"
             />
 
@@ -109,19 +101,18 @@ export function TasksPage() {
               className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
             >
               <Plus size={18} />
-              افزودن کار
+              {t("tasks.addTask")}
             </button>
           </div>
         </section>
       )}
 
-      {/* Progress - Today only */}
       {isTodaySelected && (
         <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-sm text-[var(--color-text-secondary)]">
-                پیشرفت امروز
+                {t("tasks.todayProgress")}
               </p>
 
               <div className="mt-2 flex items-baseline gap-2">
@@ -130,7 +121,9 @@ export function TasksPage() {
                 </span>
 
                 <span className="text-sm text-[var(--color-text-muted)]">
-                  از {selectedTotalCount} کار
+                  {t("tasks.ofTasks", {
+                    count: selectedTotalCount,
+                  })}
                 </span>
               </div>
             </div>
@@ -151,12 +144,12 @@ export function TasksPage() {
         </section>
       )}
 
-      {/* Task list */}
       <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-        {/* Filters */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] p-4">
           <h2 className="font-bold">
-            {isTodaySelected ? "لیست کارهای امروز" : "لیست کارهای این روز"}
+            {isTodaySelected
+              ? t("tasks.todayList")
+              : t("tasks.selectedDayList")}
           </h2>
 
           <div className="flex rounded-lg bg-[var(--color-bg)] p-1">
@@ -164,26 +157,25 @@ export function TasksPage() {
               active={filter === "all"}
               onClick={() => setFilter("all")}
             >
-              همه
+              {t("tasks.filters.all")}
             </FilterButton>
 
             <FilterButton
               active={filter === "active"}
               onClick={() => setFilter("active")}
             >
-              باقی‌مانده
+              {t("tasks.filters.active")}
             </FilterButton>
 
             <FilterButton
               active={filter === "completed"}
               onClick={() => setFilter("completed")}
             >
-              انجام‌شده
+              {t("tasks.filters.completed")}
             </FilterButton>
           </div>
         </div>
 
-        {/* Items */}
         <div className="divide-y divide-[var(--color-border)]">
           {selectedVisibleTasks.length === 0 ? (
             <div className="px-5 py-12 text-center">
@@ -193,7 +185,7 @@ export function TasksPage() {
               />
 
               <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
-                کاری در این بخش وجود ندارد.
+                {t("tasks.empty")}
               </p>
             </div>
           ) : (
@@ -221,12 +213,16 @@ function TaskRow({
   onToggle: () => void;
   onDelete: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="group flex items-center gap-3 px-5 py-4 transition-colors hover:bg-[var(--color-surface-hover)]">
       <button
         type="button"
         onClick={onToggle}
-        aria-label={task.completed ? "بازگرداندن کار" : "انجام کار"}
+        aria-label={
+          task.completed ? t("tasks.restoreTask") : t("tasks.completeTask")
+        }
         className={[
           "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all",
           task.completed
@@ -251,7 +247,7 @@ function TaskRow({
       <button
         type="button"
         onClick={onDelete}
-        aria-label="حذف کار"
+        aria-label={t("tasks.deleteTask")}
         className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-text-muted)] opacity-0 transition-all hover:bg-[rgba(239,68,68,0.1)] hover:text-[var(--color-danger)] group-hover:opacity-100"
       >
         <Trash2 size={16} />
