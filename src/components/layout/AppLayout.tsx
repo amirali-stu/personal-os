@@ -8,10 +8,8 @@ import { MainContent } from "./MainContent";
 import { Sidebar } from "./Sidebar";
 import { MusicPlayer } from "../../features/music/components/MusicPlayer";
 import { ToastContainer } from "../ui/Toast";
-import {
-  CommandPalette,
-  type CommandAction,
-} from "../command/CommandPalette";
+import { Loader2 } from "lucide-react";
+import { CommandPalette, type CommandAction } from "../command/CommandPalette";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 
 export function AppLayout() {
@@ -26,6 +24,7 @@ export function AppLayout() {
 
   const language = useSettingsStore((state) => state.language);
   const isRtl = language === "fa";
+  const isApplying = useSettingsStore((state) => state.isApplying);
 
   const openCommand = useCallback(() => setCommandOpen(true), []);
   const closeCommand = useCallback(() => setCommandOpen(false), []);
@@ -97,6 +96,20 @@ export function AppLayout() {
         onClose={closeCommand}
         extraActions={extraActions}
       />
+
+      {isApplying && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-10 py-8 shadow-2xl">
+            <Loader2
+              size={36}
+              className="animate-spin text-[var(--color-primary)]"
+            />
+            <p className="text-sm font-medium text-[var(--color-text)]">
+              در حال اعمال تغییرات...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

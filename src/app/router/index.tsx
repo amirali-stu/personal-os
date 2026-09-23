@@ -6,6 +6,7 @@ import { TradingPage } from "../../features/trading/TradingPage";
 import { MarketsPage } from "../../features/markets/MarketsPage";
 import { MusicPage } from "../../features/music/MusicPage";
 import { SettingsPage } from "../../features/settings/SettingsPage";
+import { MotivationPage } from "../../features/motivation/MotivationPage";
 import { AIPage } from "../../features/ai/AIPage";
 
 export function AppRouter() {
@@ -18,6 +19,7 @@ export function AppRouter() {
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/music" element={<MusicPage />} />
         <Route path="/ai" element={<AIPage />} />
+        <Route path="/motivation" element={<MotivationPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
 

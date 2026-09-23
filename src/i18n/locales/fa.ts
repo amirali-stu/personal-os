@@ -3,6 +3,7 @@ const fa = {
     dashboard: "داشبورد",
     tasks: "کارهای امروز",
     trading: "ژورنال ترید",
+    motivation: "انگیزه",
     markets: "بازارها",
     music: "موسیقی",
     ai: "دستیار هوش مصنوعی",

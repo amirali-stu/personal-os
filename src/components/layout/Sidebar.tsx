@@ -4,6 +4,7 @@ import {
   CheckSquare,
   ChartCandlestick,
   LayoutDashboard,
+  Flame,
   Music2,
   Settings,
   Sparkles,
@@ -36,6 +37,11 @@ const navigationItems = [
     labelKey: "navigation.trading",
     icon: ChartCandlestick,
     path: "/trading",
+  },
+  {
+    labelKey: "navigation.motivation",
+    icon: Flame,
+    path: "/motivation",
   },
   {
     labelKey: "navigation.markets",

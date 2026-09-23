@@ -3,6 +3,7 @@ const en = {
     dashboard: "Dashboard",
     tasks: "Today's Tasks",
     trading: "Trading Journal",
+    motivation: "Motivation",
     markets: "Markets",
     music: "Music",
     ai: "AI Assistant",

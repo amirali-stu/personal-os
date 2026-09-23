@@ -1,6 +1,5 @@
 // src/features/trading/TradingPage.tsx
 
-
 import { TradingHeader } from "./components/TradingHeader";
 import { TradingStats } from "./components/TradingStats";
 import { DailyLimit } from "./components/DailyLimit";
@@ -9,12 +8,12 @@ import { TradeTable } from "./components/TradeTable";
 import { WeekendState } from "./components/WeekendState";
 import { TradeCharts } from "./components/TradeCharts";
 import { useTrades } from "./hooks/useTrades";
+import { PeriodReview } from "./components/PeriodReview";
 
 import { useSettingsStore } from "../../app/store/settingsStore";
 import { formatFullDate } from "../../lib/dateUtils";
 
 export function TradingPage() {
-
   const {
     trades,
     todayTrades,
@@ -61,6 +60,7 @@ export function TradingPage() {
         failedTrades={failedTrades}
         tradeLimit={tradeLimit}
       />
+      <PeriodReview trades={trades} />
 
       <DailyLimit count={todayTrades.length} limit={tradeLimit} />
 

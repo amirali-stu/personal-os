@@ -24,7 +24,10 @@ function ToastCard({ toast }: { toast: ToastItem }) {
 
   return (
     <div
-      className={`flex min-w-[280px] max-w-[420px] items-start gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-md animate-in slide-in-from-top-2 fade-in duration-300 ${colors[toast.type]}`}
+      className={`flex min-w-[280px] max-w-[420px] items-start gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-md ${colors[toast.type]}`}
+      style={{
+        animation: "toastSlideIn 0.35s ease-out forwards",
+      }}
       role="alert"
     >
       <Icon size={18} className="mt-0.5 shrink-0" />
@@ -49,7 +52,7 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed left-1/2 top-4 z-[100] flex -translate-x-1/2 flex-col gap-2">
+    <div className="pointer-events-none fixed left-4 top-4 z-[100] flex flex-col gap-2">
       {toasts.map((toast) => (
         <div key={toast.id} className="pointer-events-auto">
           <ToastCard toast={toast} />
