@@ -71,28 +71,34 @@ export function TradeTable({ trades, loading, onDelete }: Props) {
     if (period === "all") return trades;
 
     const now = new Date();
-    const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
 
     if (period === "today") {
+      const todayStart = new Date(now);
+      todayStart.setHours(0, 0, 0, 0);
+
       return trades.filter((t) => new Date(t.createdAt) >= todayStart);
     }
 
     if (period === "week") {
-      const weekStart = new Date(todayStart);
-      const day = weekStart.getDay();
-      const diff = isRtl ? (day + 1) % 7 : day === 0 ? 6 : day - 1;
-      weekStart.setDate(weekStart.getDate() - diff);
-      return trades.filter((t) => new Date(t.createdAt) >= weekStart);
+      // ۷ روز اخیر (از همین لحظه به عقب)
+      const weekAgo = new Date(now);
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      weekAgo.setHours(0, 0, 0, 0);
+
+      return trades.filter((t) => new Date(t.createdAt) >= weekAgo);
     }
 
     if (period === "month") {
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      return trades.filter((t) => new Date(t.createdAt) >= monthStart);
+      // ۳۰ روز اخیر
+      const monthAgo = new Date(now);
+      monthAgo.setDate(monthAgo.getDate() - 30);
+      monthAgo.setHours(0, 0, 0, 0);
+
+      return trades.filter((t) => new Date(t.createdAt) >= monthAgo);
     }
 
     return trades;
-  }, [trades, period, isRtl]);
+  }, [trades, period]);
 
   const pageSize = limit === 0 ? filteredByPeriod.length || 1 : limit;
   const totalPages = Math.max(1, Math.ceil(filteredByPeriod.length / pageSize));
