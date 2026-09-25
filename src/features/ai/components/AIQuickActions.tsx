@@ -1,4 +1,10 @@
-import { BarChart3, CalendarCheck, LineChart, ListTodo } from "lucide-react";
+import {
+  BarChart3,
+  CalendarX,
+  Percent,
+  ShieldAlert,
+  TrendingDown,
+} from "lucide-react";
 
 type Props = {
   onSelect: (text: string) => void;
@@ -6,30 +12,36 @@ type Props = {
 
 const actions = [
   {
-    label: "بررسی کارهای امروز",
-    icon: ListTodo,
-    prompt: "کارهای امروز من را بررسی کن",
-  },
-  {
-    label: "تحلیل عملکرد ترید",
+    label: "تحلیل کلی ژورنال",
     icon: BarChart3,
-    prompt: "عملکرد ترید من را تحلیل کن",
+    prompt: "کل ژورنال من را تحلیل کن و نقاط قوت و ضعفم را بگو",
   },
   {
-    label: "تحلیل بازار",
-    icon: LineChart,
-    prompt: "وضعیت بازار را بررسی کن",
+    label: "علت استاپ‌ها",
+    icon: TrendingDown,
+    prompt: "علت اصلی استاپ‌ها و ضررهای من چیست؟ الگوها را پیدا کن",
   },
   {
-    label: "برنامه امروز",
-    icon: CalendarCheck,
-    prompt: "برای امروز یک برنامه پیشنهادی بساز",
+    label: "پیشنهاد ریسک",
+    icon: Percent,
+    prompt: "با توجه به ژورنالم، چند درصد ریسک برای هر معامله پیشنهاد می‌دهی؟",
+  },
+  {
+    label: "روزهای خطرناک",
+    icon: CalendarX,
+    prompt: "کدام روزهای هفته برای من خطرناک‌تر است و بهتر است ترید نکنم؟",
+  },
+  {
+    label: "مدیریت احساسات",
+    icon: ShieldAlert,
+    prompt:
+      "از روی ژورنالم بگو مشکل اصلی روانشناسی ترید من چیست و چطور درستش کنم",
   },
 ];
 
 export function AIQuickActions({ onSelect }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
       {actions.map((action) => {
         const Icon = action.icon;
 
@@ -41,7 +53,6 @@ export function AIQuickActions({ onSelect }: Props) {
             className="flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3 text-right transition-all hover:border-[var(--color-border-hover)] hover:bg-[var(--color-surface-hover)] active:scale-[0.98]"
           >
             <Icon size={15} className="shrink-0 text-[var(--color-primary)]" />
-
             <span className="truncate text-[10px] font-medium text-[var(--color-text-secondary)]">
               {action.label}
             </span>

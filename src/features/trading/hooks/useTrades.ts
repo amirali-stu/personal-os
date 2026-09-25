@@ -9,7 +9,6 @@ export function useTrades() {
   const [loading, setLoading] = useState(true);
 
   const timezone = useSettingsStore((state) => state.timezone);
-
   const today = getTodayDate(timezone);
 
   const todayTrades = useMemo(
@@ -75,7 +74,6 @@ export function useTrades() {
 
   async function deleteTrade(id: number) {
     await tradingDb.trades.delete(id);
-
     setTrades((current) => current.filter((trade) => trade.id !== id));
   }
 

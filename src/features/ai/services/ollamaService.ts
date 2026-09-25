@@ -24,7 +24,6 @@ type OllamaChatResponse = {
 export async function checkOllamaConnection(): Promise<boolean> {
   try {
     const response = await fetch(`${OLLAMA_BASE_URL}/api/tags`);
-
     return response.ok;
   } catch {
     return false;
@@ -39,7 +38,6 @@ export async function getOllamaModels(): Promise<OllamaModel[]> {
   }
 
   const data = await response.json();
-
   return data.models ?? [];
 }
 
@@ -47,10 +45,20 @@ export async function generateOllamaResponse(
   model: string,
   messages: AIMessageData[],
 ): Promise<string> {
-  const ollamaMessages: OllamaMessage[] = messages.map((message) => ({
-    role: message.role,
-    content: message.content,
-  }));
+  // اولین پیام را به عنوان system در نظر می‌گیریم
+  const ollamaMessages: OllamaMessage[] = messages.map((message, index) => {
+    if (index === 0) {
+      return {
+        role: "system",
+        content: message.content,
+      };
+    }
+
+    return {
+      role: message.role,
+      content: message.content,
+    };
+  });
 
   const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
     method: "POST",
