@@ -9,6 +9,7 @@ import { WeekendState } from "./components/WeekendState";
 import { TradeCharts } from "./components/TradeCharts";
 import { useTrades } from "./hooks/useTrades";
 import { PeriodReview } from "./components/PeriodReview";
+import { TradingSubNav } from "./components/TradingSubNav";
 
 import { useSettingsStore } from "../../app/store/settingsStore";
 import { formatFullDate } from "../../lib/dateUtils";
@@ -48,6 +49,8 @@ export function TradingPage() {
   return (
     <div dir={isRtl ? "rtl" : "ltr"} className="space-y-6">
       <TradingHeader />
+
+      <TradingSubNav />
 
       <div className="text-start text-xs text-[var(--color-text-muted)]">
         {formattedDate}

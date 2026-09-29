@@ -3,6 +3,9 @@ import { AppLayout } from "../../components/layout/AppLayout";
 import { DashboardPage } from "../../features/dashboard/DashboardPage";
 import { TasksPage } from "../../features/tasks/TasksPage";
 import { TradingPage } from "../../features/trading/TradingPage";
+import { TradingPlanPage } from "../../features/trading/plan/TradingPlanPage";
+import { SetupsPage } from "../../features/trading/setups/SetupsPage";
+import { SetupDetailPage } from "../../features/trading/setups/SetupDetailPage";
 import { MarketsPage } from "../../features/markets/MarketsPage";
 import { MusicPage } from "../../features/music/MusicPage";
 import { SettingsPage } from "../../features/settings/SettingsPage";
@@ -16,6 +19,9 @@ export function AppRouter() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/trading" element={<TradingPage />} />
+        <Route path="/trading/plan" element={<TradingPlanPage />} />
+        <Route path="/trading/setups" element={<SetupsPage />} />
+        <Route path="/trading/setups/:id" element={<SetupDetailPage />} />
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/music" element={<MusicPage />} />
         <Route path="/ai" element={<AIPage />} />

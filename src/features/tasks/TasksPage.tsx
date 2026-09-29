@@ -19,6 +19,7 @@ import { ProgressRing } from "../../components/ui/ProgressRing";
 import { Confetti } from "../../components/ui/Confetti";
 import { DailyReview } from "../dashboard/components/DailyReview";
 import { useToast } from "../../components/ui/Toast";
+import { useSettingsStore } from "../../app/store/settingsStore";
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
   high: "text-red-400 border-red-500/40 bg-red-500/10",
@@ -41,22 +42,24 @@ export function TasksPage() {
     reorderTasks,
     exportTasks,
     importTasks,
-    loading,  
+    loading,
   } = useTasks();
+  const timezone = useSettingsStore((state) => state.timezone);
 
   const [newTask, setNewTask] = useState("");
   const [newPriority, setNewPriority] = useState<TaskPriority>("medium");
   const [newTags, setNewTags] = useState("");
-  const [selectedDate, setSelectedDate] = useState(getTodayDate());
+  const [selectedDate, setSelectedDate] = useState(() =>
+    getTodayDate(timezone),
+  );
   const [showConfetti, setShowConfetti] = useState(false);
   const [dragId, setDragId] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevProgress = useRef(0);
 
-  const today = getTodayDate();
+  const today = getTodayDate(timezone);
   const isTodaySelected = selectedDate === today;
-
   const selectedTasks = tasks
     .filter((task) => task.date === selectedDate)
     .sort((a, b) => a.sortOrder - b.sortOrder);

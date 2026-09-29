@@ -111,18 +111,27 @@ function getGregorianMonthDays(anchorDate: Date) {
 }
 
 function shiftPersianMonth(date: Date, amount: number) {
+  // const current = getPersianDate(date);
+
+  // ابتدا تقریباً یک ماه جلو/عقب می‌رویم
   const result = new Date(date);
+  result.setDate(result.getDate() + amount * 30);
 
-  result.setDate(result.getDate() + amount * 40);
+  // ماه شمسی هدف
+  const targetMonthKey = getPersianMonthKey(result);
 
-  const targetMonth = getPersianMonthKey(result);
-
-  for (let i = -31; i <= 31; i++) {
+  // در محدوده‌ای نزدیک، اولین روز آن ماه را پیدا می‌کنیم
+  for (let i = -35; i <= 35; i++) {
     const candidate = new Date(result);
     candidate.setDate(result.getDate() + i);
 
-    if (getPersianMonthKey(candidate) === targetMonth) {
-      return candidate;
+    if (getPersianMonthKey(candidate) === targetMonthKey) {
+      const persian = getPersianDate(candidate);
+
+      // اگر به ماه درست رسیدیم، بهتر است روز اول ماه را برگردانیم
+      if (persian.day === 1) {
+        return candidate;
+      }
     }
   }
 
@@ -175,6 +184,11 @@ export function TaskCalendar({
   );
 
   useEffect(() => {
+    if (dateFormat === "jalali") {
+      setCurrentMonth(selectedDateObject);
+      return;
+    }
+
     setCurrentMonth(
       new Date(
         selectedDateObject.getFullYear(),
@@ -253,7 +267,11 @@ export function TaskCalendar({
 
     const todayKey = getDateKey(now);
 
-    setCurrentMonth(new Date(now.getFullYear(), now.getMonth(), 1));
+    setCurrentMonth(
+      dateFormat === "jalali"
+        ? now
+        : new Date(now.getFullYear(), now.getMonth(), 1),
+    );
 
     onSelectDate(todayKey);
   }
