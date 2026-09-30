@@ -1,39 +1,46 @@
 :root {
-  /* Background */
   --color-bg: #050505;
   --color-sidebar: #09090b;
-
-  /* Surfaces */
   --color-surface: #0d0d0f;
   --color-surface-hover: #151518;
-
-  /* Borders */
   --color-border: #262626;
   --color-border-hover: #3f3f46;
-
-  /* Text */
   --color-text: #ffffff;
   --color-text-secondary: #a3a3a3;
   --color-text-muted: #71717a;
-
-  /* Primary */
   --color-primary: #a855f7;
   --color-primary-hover: #9333ea;
   --color-primary-soft: rgba(168, 85, 247, 0.12);
-
-  /* Status */
   --color-success: #22c55e;
   --color-danger: #ef4444;
   --color-warning: #eab308;
-
-  /* Layout */
   --sidebar-width: 250px;
   --sidebar-collapsed-width: 72px;
-
-  /* Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+
+  --cs-table-bg: #202020;
+  --cs-table-header: #1a1a1a;
+  --cs-table-border: #2e2e2e;
+  --cs-table-hover: #262626;
+  --cs-table-alt: #1c1c1c;
+  --cs-dropdown-bg: #252525;
+  --cs-dropdown-hover: #333333;
+  --cs-dropdown-border: #3a3a3a;
+  --cs-input-bg: #1a1a1a;
+  --cs-muted: #6b6b6b;
+  --cs-text: #d4d4d4;
+  --cs-text-soft: #9a9a9a;
+  --cs-modal-bg: #1e1e1e;
+  --cs-overlay: rgba(0, 0, 0, 0.7);
+  --cs-danger-text: #e07070;
+  --cs-danger-btn: #a04040;
+  --cs-btn-bg: #3a3a3a;
+  --cs-success-tag: #2b593f;
+  --cs-loss-tag: #6e3630;
+  --cs-scrollbar-track: #1a1a1a;
+  --cs-scrollbar-thumb: #4a4a4a;
 }
 
 :root.light-mode {
@@ -41,13 +48,33 @@
   --color-sidebar: #ffffff;
   --color-surface: #ffffff;
   --color-surface-hover: #f1f1f4;
-
   --color-border: #e4e4e7;
   --color-border-hover: #d4d4d8;
-
   --color-text: #18181b;
   --color-text-secondary: #52525b;
   --color-text-muted: #71717a;
+
+  --cs-table-bg: #ffffff;
+  --cs-table-header: #f4f4f5;
+  --cs-table-border: #e4e4e7;
+  --cs-table-hover: #f4f4f5;
+  --cs-table-alt: #fafafa;
+  --cs-dropdown-bg: #ffffff;
+  --cs-dropdown-hover: #f4f4f5;
+  --cs-dropdown-border: #e4e4e7;
+  --cs-input-bg: #f4f4f5;
+  --cs-muted: #71717a;
+  --cs-text: #18181b;
+  --cs-text-soft: #52525b;
+  --cs-modal-bg: #ffffff;
+  --cs-overlay: rgba(15, 15, 15, 0.45);
+  --cs-danger-text: #dc2626;
+  --cs-danger-btn: #ef4444;
+  --cs-btn-bg: #e4e4e7;
+  --cs-success-tag: #dcfce7;
+  --cs-loss-tag: #fee2e2;
+  --cs-scrollbar-track: #f4f4f5;
+  --cs-scrollbar-thumb: #d4d4d8;
 }
 
 :root.light-mode .text-white {
@@ -56,4 +83,44 @@
 
 :root.light-mode .hover\:text-white:hover {
   color: var(--color-text);
+}
+
+.cs-table-scroll,
+.cs-modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cs-scrollbar-thumb) var(--cs-scrollbar-track);
+}
+
+.cs-table-scroll::-webkit-scrollbar,
+.cs-modal-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.cs-table-scroll::-webkit-scrollbar-track,
+.cs-modal-scroll::-webkit-scrollbar-track {
+  background: var(--cs-scrollbar-track);
+  border-radius: 4px;
+}
+
+.cs-table-scroll::-webkit-scrollbar-thumb,
+.cs-modal-scroll::-webkit-scrollbar-thumb {
+  background: var(--cs-scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--cs-scrollbar-track);
+}
+
+.cs-table-scroll::-webkit-scrollbar-thumb:hover,
+.cs-modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+.cs-table-scroll::-webkit-scrollbar-corner,
+.cs-modal-scroll::-webkit-scrollbar-corner {
+  background: var(--cs-scrollbar-track);
+}
+
+@keyframes csLightboxIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }

@@ -1,29 +1,17 @@
 import { NavLink } from "react-router-dom";
-import { BookOpen, ClipboardList, Rocket } from "lucide-react";
+import { BookOpen, BookMarked, ClipboardList, Rocket } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../../app/store/settingsStore";
 
 const tabs = [
-  {
-    path: "/trading",
-    end: true,
-    label: "ژورنال ترید",
-    icon: BookOpen,
-  },
-  {
-    path: "/trading/plan",
-    end: false,
-    label: "تریدینگ پلن",
-    icon: ClipboardList,
-  },
-  {
-    path: "/trading/setups",
-    end: false,
-    label: "ستاپ‌ها",
-    icon: Rocket,
-  },
+  { path: "/trading", end: true, key: "trading.subnav.journal" as const, icon: BookOpen },
+  { path: "/trading/plan", end: false, key: "trading.subnav.plan" as const, icon: ClipboardList },
+  { path: "/trading/setups", end: false, key: "trading.subnav.setups" as const, icon: Rocket },
+  { path: "/trading/case-studies", end: false, key: "trading.subnav.caseStudies" as const, icon: BookMarked },
 ];
 
 export function TradingSubNav() {
+  const { t } = useTranslation();
   const language = useSettingsStore((s) => s.language);
   const isRtl = language === "fa";
 
@@ -49,7 +37,7 @@ export function TradingSubNav() {
             }
           >
             <Icon size={16} strokeWidth={1.8} />
-            <span className="font-medium">{tab.label}</span>
+            <span className="font-medium">{t(tab.key)}</span>
           </NavLink>
         );
       })}

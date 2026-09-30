@@ -35,7 +35,7 @@ function AppLanguageSync() {
   return null;
 }
 
-function App() {
+function  App() {
   const initializeSettings = useSettingsStore((state) => state.initialize);
 
   useEffect(() => {
