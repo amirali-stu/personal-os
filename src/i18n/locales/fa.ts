@@ -307,6 +307,7 @@ const fa = {
       plan: "تریدینگ پلن",
       setups: "ستاپ‌ها",
       caseStudies: "موارد بررسی‌شده",
+      forwardTests: "فوروارد تست",
     },
     caseStudies: {
       title: "موارد بررسی‌شده",

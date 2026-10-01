@@ -13,6 +13,10 @@ import { SettingsPage } from "../../features/settings/SettingsPage";
 import { MotivationPage } from "../../features/motivation/MotivationPage";
 import { AIPage } from "../../features/ai/AIPage";
 import { CaseStudyDetailPage } from "../../features/trading/caseStudies/CaseStudyDetailPage";
+import { ForwardTestsPage } from "../../features/trading/forwardTests/ForwardTestsPage";
+import { MarkupDetailPage } from "../../features/trading/forwardTests/MarkupDetailPage";
+import { WeekDetailPage } from "../../features/trading/forwardTests/WeekDetailPage";
+import { KeyLessonsPage } from "../../features/trading/forwardTests/KeyLessonsPage";
 
 export function AppRouter() {
   return (
@@ -25,15 +29,28 @@ export function AppRouter() {
         <Route path="/trading/setups" element={<SetupsPage />} />
         <Route path="/trading/setups/:id" element={<SetupDetailPage />} />
         <Route path="/trading/case-studies" element={<CaseStudiesPage />} />
+        <Route
+          path="/trading/case-studies/:id"
+          element={<CaseStudyDetailPage />}
+        />
+        <Route path="/trading/forward-tests" element={<ForwardTestsPage />} />
+        <Route
+          path="/trading/forward-tests/:markupId"
+          element={<MarkupDetailPage />}
+        />
+        <Route
+          path="/trading/forward-tests/:markupId/key-lessons"
+          element={<KeyLessonsPage />}
+        />
+        <Route
+          path="/trading/forward-tests/:markupId/week/:weekId"
+          element={<WeekDetailPage />}
+        />
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/music" element={<MusicPage />} />
         <Route path="/ai" element={<AIPage />} />
         <Route path="/motivation" element={<MotivationPage />} />
         <Route path="/settings" element={<SettingsPage />} />
-        <Route
-          path="/trading/case-studies/:id"
-          element={<CaseStudyDetailPage />}
-        />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

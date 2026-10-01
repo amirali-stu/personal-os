@@ -306,6 +306,7 @@ const en = {
       plan: "Trading Plan",
       setups: "Setups",
       caseStudies: "Case Studies",
+      forwardTests: "Forward Tests",
     },
     caseStudies: {
       title: "Case Studies",
@@ -353,7 +354,7 @@ const en = {
       select: "Select...",
       searchOption: "Search for an option...",
       selectOrCreate: "Select an option or create one",
-      createNamed: "Create \"{{name}}\"",
+      createNamed: 'Create "{{name}}"',
       addOption: "Add option",
       edit: "Edit",
       bgColor: "Background color",

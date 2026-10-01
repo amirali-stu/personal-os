@@ -1,13 +1,45 @@
 import { NavLink } from "react-router-dom";
-import { BookOpen, BookMarked, ClipboardList, Rocket } from "lucide-react";
+import {
+  BookOpen,
+  BookMarked,
+  ClipboardList,
+  Rocket,
+  Sparkles,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../../app/store/settingsStore";
 
 const tabs = [
-  { path: "/trading", end: true, key: "trading.subnav.journal" as const, icon: BookOpen },
-  { path: "/trading/plan", end: false, key: "trading.subnav.plan" as const, icon: ClipboardList },
-  { path: "/trading/setups", end: false, key: "trading.subnav.setups" as const, icon: Rocket },
-  { path: "/trading/case-studies", end: false, key: "trading.subnav.caseStudies" as const, icon: BookMarked },
+  {
+    path: "/trading",
+    end: true,
+    key: "trading.subnav.journal" as const,
+    icon: BookOpen,
+  },
+  {
+    path: "/trading/plan",
+    end: false,
+    key: "trading.subnav.plan" as const,
+    icon: ClipboardList,
+  },
+  {
+    path: "/trading/setups",
+    end: false,
+    key: "trading.subnav.setups" as const,
+    icon: Rocket,
+  },
+  {
+    path: "/trading/case-studies",
+    end: false,
+    key: "trading.subnav.caseStudies" as const,
+    icon: BookMarked,
+  },
+  {
+    path: "/trading/forward-tests",
+    end: false,
+    key: "trading.subnav.forwardTests" as const,
+    icon: Sparkles,
+  },
 ];
 
 export function TradingSubNav() {
